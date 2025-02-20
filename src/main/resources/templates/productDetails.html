@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homely - Organic Products</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+
+        .navbar {
+                    padding: 15px 0;
+                    background: white;
+                }
+
+                .brand-logo {
+                    height: 40px;
+                }
+
+
+
+        .product-images {
+            margin-bottom: 20px;
+        }
+
+        star-rating{
+            color: gray;
+            margin-bottom: 15px;
+        }
+        .checked {
+            color: orange;
+         }
+
+        .product-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .product-rating {
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            color: #2E8B57;
+            font-weight: 600;
+            margin: 15px 0;
+        }
+
+        .quantity-selector {
+            margin: 20px 0;
+        }
+
+        .quantity-selector select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .add-to-cart-btn, .buy-now-btn, .soldout-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .add-to-cart-btn {
+            background: #f8f9fa;
+            color: #2E8B57;
+            border: 1px solid #2E8B57;
+        }
+
+
+
+        .soldout-btn{
+            background: #2E8B57;
+            color: white;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .product-card {
+            border: 1px solid #eee;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            background-color:#f3fff3;
+        }
+
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+
+        .product-price {
+            color: red;
+            font-weight: 600;
+            text-decoration:line-through;
+        }
+
+        .discount-price{
+            color: #2E8B57;
+            font-weight:600;
+        }
+
+        .similar-products {
+            margin-top: 40px;
+        }
+
+        .similar-product-card {
+            border: 1px solid #eee;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            background-color:#f3fff3;
+        }
+
+        .similar-product-card img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .similar-product-title {
+            font-size: 0.9rem;
+            margin: 10px 0;
+        }
+
+        .similar-product-price {
+            color: #2E8B57;
+            font-weight: 600;
+        }
+
+        product-description{
+            color: gray;
+        }
+
+        footer {
+            background: #2E8B57;
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 50px;
+        }
+
+        .breadcrumb {
+            margin: 20px 0;
+        }
+
+        .rating-input {
+            margin: 20px 0;
+        }
+
+                footer {
+                    background: #2E8B57;
+                    color: white;
+                    padding: 40px 0 20px;
+                }
+
+                footer h5 {
+                    margin-bottom: 20px;
+                }
+
+                footer ul {
+                    list-style: none;
+                    padding: 0;
+                }
+
+                footer ul li {
+                    margin-bottom: 10px;
+                }
+
+                footer a {
+                    color: white;
+                    text-decoration: none;
+                }
+
+                .social-icons {
+                    display: flex;
+                    gap: 15px;
+                    margin-top: 20px;
+                }
+
+        .product-gallery {
+            display: flex;
+            gap: 20px;
+        }
+
+        .thumbnail-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+         .thumbnail {
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        .thumbnail.active {
+            border-color: #28a745;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail img:hover {
+            transform: scale(1.05); /* Slight zoom on hover */
+        }
+
+        .main-image-container {
+             position: relative;
+             width: 100%; /* Adjust the container to your layout */
+             max-width: 400px; /* Adjust as per design */
+             aspect-ratio: 1 / 1; /* Ensure the container is square */
+             overflow: hidden;
+             border: 1px solid #ddd;
+        }
+
+        .main-image-container img {
+           width: 100%;
+           height: 100%;
+           object-fit: cover; /* Ensures the image fills the box while maintaining its aspect ratio */
+        }
+
+        .zoom-lens {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            width: 100px;
+            height: 100px;
+            cursor: crosshair;
+            display: none;
+        }
+
+        .zoom-result {
+            position: absolute;
+            top: 0;
+            left: 105%;
+            border: 1px solid #d4d4d4;
+            width: 400px;
+            height: 400px;
+            overflow: hidden;
+            display: none;
+            background-repeat: no-repeat;
+            z-index: 999;
+            border-radius: 8px;
+        }
+
+
+
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <div class="d-flex">
+            <a class="navbar-brand" href="/">
+                <img src="/images/logo.png" alt="Homely" class="brand-logo">
+            </a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ml-5">
+                <li class="nav-item">
+                    <a class="nav-link" href="/home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/products">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/wallet">Wallet</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex align-items-center">
+            <form class="d-flex me-3">
+                <input class="form-control" type="search" placeholder="Search">
+            </form>
+            <a href="/wishlist" class="me-3"><i class="far fa-heart"></i></a>
+            <a href="/cart/view-cart" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle fa-lg"></i> <!-- Profile Icon -->
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" th:href="@{/view-profile}">View Profile</a></li>
+                    <li><a class="dropdown-item" th:href="@{/view-orders}">View Orders</a></li>
+                    <li><a class="dropdown-item" th:href="@{/update-password}">Update Password</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+
+<!-- Products display -->
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/products">Products</a></li>
+            <li class="breadcrumb-item active" aria-current="page" th:text="${product.name}">Malabar Pathiri Podi</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+
+        <!-- Product Images -->
+        <div class="col-md-6">
+            <div class="product-gallery">
+                <div class="thumbnail-list">
+                    <div class="thumbnail" th:each="image, imageStat : ${product.images}"
+                         th:classappend="${imageStat.first} ? 'active' : ''"
+                         th:data-image="${image}">
+                        <img th:if="${product.images != null and product.images.size() > 0}"
+                             th:src="${image}" alt="Thumbnail">
+                        <img th:if="${product.images == null or product.images.size() == 0}"
+                             th:src="@{/images/imageplaceholder.png}" alt="Thumbnail">
+
+                    </div>
+                </div>
+
+                <div class="main-image-container">
+                    <img th:if="${product.images != null and product.images.size() > 0}"
+                         th:src="${product.images[0]}" id="mainImage" alt="Product">
+                    <img th:if="${product.images == null or product.images.size() == 0}"
+                         th:src="@{/images/imageplaceholder.jpg}" alt="Product">
+                    <div class="zoom-lens"></div>
+                    <div class="zoom-result"></div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Product Details -->
+        <div class="col-md-6">
+            <h1 class="product-title" th:text="${product.name}">Malabar Pathiri Podi + Pepper Powder Combo</h1>
+            <input type="hidden" value="${product.id}">
+            <p class="text-muted" th:text="${product.description}" style="font-size: 15px"></p>
+           <!-- Get AVG rating from database -->
+             <div class="product-rating">
+                <p><span id="average-rating"></span><span class="fa fa-star checked"></span> (based on <span
+                    id="rating-count"></span> ratings)</p>
+             </div>
+              <p class="text-muted" th:text="${'Product Code: '+product.sku}"></p>
+
+            <span th:if="${product.quantities[0].price >= quantities[0].price}">
+                 <span>₹</span> <span id="price" class="discount-price" th:text="${quantities[0].price}"></span>
+            </span>
+
+                     <!-- Offer Percentage Calculation -->
+            <span class="offer-percentage"
+                  th:if="${product.quantities[0].price > quantities[0].price}"
+                  th:text="${'(' + T(java.lang.Math).round(100 * (product.quantities[0].price - quantities[0].price) / product.quantities[0].price) + '% off)'}">
+             </span>
+
+          <div class="quantity-selector">
+            <label>Select quantity:</label>
+            <select id="quantity" name="quantity" onchange="updatePrice()">
+                <option th:each="q : ${quantities}" th:value="${q.quantity}" th:text="${q.quantity}"></option>
+            </select>
+          </div>
+            <p class="text-muted fst-italic">Stocks left: <span class="text-muted fst-italic" id="stock-left" th:text="${product.quantities[0].stock}"></span> </p>
+
+          <div class="action-buttons">
+                  <button class="add-to-cart-btn" onclick="addToCart()">Add to Cart</button>
+          </div>
+
+          <div class="rating-input">
+            <h6>Rate this product:</h6>
+            <div id="star-rating">
+                <span data-value="1" class="star">&#9733;</span>
+                <span data-value="2" class="star">&#9733;</span>
+                <span data-value="3" class="star">&#9733;</span>
+                <span data-value="4" class="star">&#9733;</span>
+                <span data-value="5" class="star">&#9733;</span>
+            </div>
+            <button class="btn btn-sm btn-success mt-2" onclick="submitRating()">Submit Rating</button>
+          </div>
+        </div>
+    </div>
+
+
+    <!-- Similar Products -->
+    <div class="similar-products">
+        <h3>Similar Products</h3>
+        <div class="row">
+            <div class="col-md-3" th:each="product : ${similarProducts}">
+                <div class="similar-product-card">
+
+                    <img th:if="${product.images != null and product.images.size() > 0}"
+                         th:src="${product.images[0]}" alt="Product">
+                    <img th:if="${product.images == null or product.images.size() == 0}"
+                         th:src="@{/images/imageplaceholder.jpg}" alt="Product">
+                    <h5 class="product-title" th:text="${product.name}">Chili powder</h5>
+                    <span class="discount-price" th:text="${'₹' + product.discountprice}">₹99.00</span>
+                    <span class="product-price" th:text="${'₹' + product.price}">₹99.00</span>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Footer -->
+<footer class="mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <h5>About Us</h5>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Customer Service</h5>
+                <ul>
+                    <li><a href="#">Return Policy</a></li>
+                    <li><a href="#">About Shipping</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Contact Us</h5>
+                <ul>
+                    <li>Ernakulam, Kottayam</li>
+                    <li>+91 9876543210</li>
+                    <li>homely@example.com</li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Get In Touch</h5>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+    //image zooming
+
+document.addEventListener('DOMContentLoaded', function() {
+   const mainImage = document.getElementById('mainImage');
+   const zoomLens = document.querySelector('.zoom-lens');
+   const zoomResult = document.querySelector('.zoom-result');
+   const container = document.querySelector('.main-image-container');
+   const thumbnails = document.querySelectorAll('.thumbnail img');
+
+
+   function initZoom() {
+       const cx = zoomResult.offsetWidth / zoomLens.offsetWidth;
+       const cy = zoomResult.offsetHeight / zoomLens.offsetHeight;
+
+       zoomResult.style.backgroundImage = `url(${mainImage.src})`;
+       zoomResult.style.backgroundSize = `${mainImage.offsetWidth * cx}px ${mainImage.offsetHeight * cy}px`;
+   }
+
+   function moveLens(e) {
+       let rect = container.getBoundingClientRect();
+       let x = e.pageX - rect.left - window.pageXOffset - (zoomLens.offsetWidth / 2);
+       let y = e.pageY - rect.top - window.pageYOffset - (zoomLens.offsetHeight / 2);
+
+       if (x > container.offsetWidth - zoomLens.offsetWidth) x = container.offsetWidth - zoomLens.offsetWidth;
+       if (x < 0) x = 0;
+       if (y > container.offsetHeight - zoomLens.offsetHeight) y = container.offsetHeight - zoomLens.offsetHeight;
+       if (y < 0) y = 0;
+
+       zoomLens.style.left = `${x}px`;
+       zoomLens.style.top = `${y}px`;
+       zoomResult.style.backgroundPosition = `-${x * (zoomResult.offsetWidth / zoomLens.offsetWidth)}px -${y * (zoomResult.offsetHeight / zoomLens.offsetHeight)}px`;
+   }
+
+   container.addEventListener('mousemove', moveLens);
+   container.addEventListener('mouseenter', () => {
+       zoomLens.style.display = 'block';
+       zoomResult.style.display = 'block';
+   });
+   container.addEventListener('mouseleave', () => {
+       zoomLens.style.display = 'none';
+       zoomResult.style.display = 'none';
+   });
+
+   thumbnails.forEach(thumb => {
+       thumb.addEventListener('click', function() {
+           thumbnails.forEach(t => t.classList.remove('active'));
+           this.classList.add('active');
+           mainImage.src = this.src;
+           initZoom();
+       });
+   });
+
+   initZoom();
+
+});
+
+
+   const productId = [[${product.id}]];
+
+   function updatePrice() {
+   const quantity = document.getElementById('quantity').value;
+
+
+   fetch(`/api/productDetails/${productId}?quantity=${quantity}`)
+       .then(response => {
+           if (!response.ok) {
+               throw new Error(`HTTP error! status: ${response.status}`);
+           }
+           return response.json();
+       })
+       .then(data => {
+           document.getElementById('price').textContent = data.price;
+                      // Update the stock left
+           document.getElementById('stock-left').textContent = data.stock;
+
+           const addButton = document.querySelector('.add-to-cart-btn');
+           const buyButton = document.querySelector('.buy-now-btn');
+
+           if (data.stock <= 0) {
+               addButton.disabled = true;
+               buyButton.disabled = true;
+           } else {
+               addButton.disabled = false;
+               buyButton.disabled = false;
+           }
+
+       })
+       .catch(error => console.error('Error fetching price:', error));
+}
+
+    fetch(`/ratings/${productId}`)
+       .then(response => response.json())
+       .then(data => {
+           document.getElementById('average-rating').textContent = data.averageRating.toFixed(1);
+           document.getElementById('rating-count').textContent = data.ratingCount;
+       });
+
+
+   //show rating
+   let selectedRating = 0;
+   document.querySelectorAll('#star-rating .star').forEach(star => {
+       star.addEventListener('click', () => {
+           selectedRating = star.getAttribute('data-value');
+           document.querySelectorAll('#star-rating .star').forEach(s => {
+               s.style.color = s.getAttribute('data-value') <= selectedRating ? 'gold' : 'gray';
+           });
+       });
+   });
+
+   function submitRating() {
+       if (selectedRating === 0) {
+           alert("Please select a rating.");
+           return;
+       }
+
+       const productId = [[${product.id}]];
+       const userId = [[${userId}]];
+       fetch(`/ratings/${productId}?userId=${userId}&rating=${selectedRating}`, {
+           method: 'POST'
+       })
+           .then(response => {
+               if (response.ok) {
+                   alert("Rating submitted successfully.");
+               } else {
+                   alert("Error submitting rating.");
+               }
+           });
+   }
+
+
+//add to cart
+
+    function addToCart() {
+    const productcount = 1;
+
+  const price = parseFloat(document.getElementById('price').textContent.trim().replace(/[^\d.-]/g, ''));
+  const weight = document.getElementById('quantity').value
+  const stock = parseFloat(document.getElementById('stock-left').textContent.trim().replace(/[^\d.-]/g, ''));
+
+
+    fetch('/cart/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            productid: productId,
+            productcount: productcount,
+            productprice: price,
+            weight: weight,
+            stock: stock
+        }),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        if (data.success) {
+            Swal.fire({
+                icon: "success",
+                title: "Product added to cart successfully!",
+                showConfirmButton: false,
+                timer: 1500
+           });
+        } else {
+            alert('Failed to add product to cart.');
+        }
+    })
+    .catch((error) => console.error('Error:', error));
+}
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <title>Document</title>
+    <style>
+
+        canvas {
+            border: 1px solid black;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Add Product</h1>
+    <form th:action="@{/admin/products}" method="post" id="imageForm" enctype="multipart/form-data">
+        <div class="modal-header">
+            <h5 class="modal-title" id="createProductModalLabel">Add New Product</h5>
+            <a type="button" class="btn-close" href="/admin/products" aria-label="Close"></a>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+                <label for="productname" class="form-label">Product Name</label>
+                <input type="text" name="name" id="productname" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="sku" class="form-label">SKU</label>
+                <input type="text" name="sku" id="sku" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <input type="text" name="description" id="description" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <select name="category" id="category" class="form-control" required>
+                    <!-- Placeholder option -->
+                    <option value="" disabled selected>Select a category</option>
+
+                    <option th:each="category : ${categories}"
+                            th:value="${category.id}"
+                            th:text="${category.categoryname}">
+                    </option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Base Price</label>
+                <input type="text" name="price" id="price" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="discount" class="form-label">Base Discount Price</label>
+                <input type="text" name="discountprice" id="discount" class="form-control" required>
+            </div>
+            <div id="quantityContainer">
+                <p>Add available quantities</p>
+                <div class="quantity-row">
+                    <input type="text" name="quantity" class="form-control" placeholder="Quantity" required>
+                    <input type="text" name="qprice" class="form-control" placeholder="Price" required>
+                    <input type="number" name="qstock" class="form-control" placeholder="Stock" required>
+                </div>
+            </div>
+
+            <button type="button" class="btn-sm btn-success mb-3" onclick="addQuantityRow()">Add More Quantities</button>
+
+            <!-- Image Upload -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="file1">Upload Image 1</label>
+                    <input type="file" id="file1" name="file1" class="form-control" accept="image/*" required>
+                </div>
+                <!-- Image Preview After Cropping -->
+                <div class="col-md-6 mb-3">
+                    <label>Image Preview</label>
+                    <img id="croppedPreview1" src="" class="img-thumbnail" style="display:none; max-width: 200px;">
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="file2">Upload Image 2</label>
+                    <input type="file" id="file2" name="file2" class="form-control" accept="image/*" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label>Image Preview</label>
+                    <img id="croppedPreview2" src="" class="img-thumbnail" style="display:none; max-width: 200px;">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="file3">Upload Image 3</label>
+                    <input type="file" id="file3" name="file3" class="form-control" accept="image/*" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Image Preview</label>
+                    <img id="croppedPreview3" src="" class="img-thumbnail" style="display:none; max-width: 200px;">
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Save</button>
+            <button type="button" href="/admin/products" class="btn btn-secondary">Cancel</button>
+        </div>
+    </form>
+
+</div>
+
+<!-- Image Upload Modals for Cropping -->
+<!-- Modal for Image 1 -->
+<div class="modal fade" id="cropperModal1" tabindex="-1" role="dialog" aria-labelledby="cropperModalLabel1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropperModalLabel1">Crop Image 1</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="image1" src="" alt="Image 1">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="cropImage1">Crop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Image 2 -->
+<div class="modal fade" id="cropperModal2" tabindex="-1" role="dialog" aria-labelledby="cropperModalLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropperModalLabel2">Crop Image 2</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="image2" src="" alt="Image 2">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="cropImage2">Crop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Image 3 -->
+<div class="modal fade" id="cropperModal3" tabindex="-1" role="dialog" aria-labelledby="cropperModalLabel3" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropperModalLabel3">Crop Image 3</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="image3" src="" alt="Image 3">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="cropImage3">Crop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function addQuantityRow() {
+       let container = document.getElementById("quantityContainer");
+       let newRow = document.createElement("div");
+       newRow.classList.add("quantity-row");
+       newRow.innerHTML = `
+           <input type="text" name="quantity" class="form-control" placeholder="Quantity" required>
+           <input type="text" name="qprice" class="form-control" placeholder="Price" required>
+           <input type="number" name="qstock" class="form-control" placeholder="Stock" required>
+       `;
+       container.appendChild(newRow);
+   }
+
+   // Initialize Cropper.js for all images
+   let cropper1, cropper2, cropper3;
+
+   function initializeCropper(imageId) {
+       return new Cropper(document.getElementById(imageId), {
+           aspectRatio: 1,  // Optional: make it square
+           viewMode: 1, // Ensure the image fits within the container
+           scalable: true,
+           zoomable: true
+       });
+   }
+
+   document.getElementById('file1').addEventListener('change', function (event) {
+       var reader = new FileReader();
+       reader.onload = function (e) {
+           var imageElement = document.getElementById('image1');
+           imageElement.src = e.target.result;
+           $('#cropperModal1').modal('show');
+           if (cropper1) cropper1.destroy();  // Destroy any previous instance
+           cropper1 = initializeCropper('image1');
+       };
+       reader.readAsDataURL(event.target.files[0]);
+   });
+
+   document.getElementById('file2').addEventListener('change', function (event) {
+       var reader = new FileReader();
+       reader.onload = function (e) {
+           var imageElement = document.getElementById('image2');
+           imageElement.src = e.target.result;
+           $('#cropperModal2').modal('show');
+           if (cropper2) cropper2.destroy();
+           cropper2 = initializeCropper('image2');
+       };
+       reader.readAsDataURL(event.target.files[0]);
+   });
+
+   document.getElementById('file3').addEventListener('change', function (event) {
+       var reader = new FileReader();
+       reader.onload = function (e) {
+           var imageElement = document.getElementById('image3');
+           imageElement.src = e.target.result;
+           $('#cropperModal3').modal('show');
+           if (cropper3) cropper3.destroy();
+           cropper3 = initializeCropper('image3');
+       };
+       reader.readAsDataURL(event.target.files[0]);
+   });
+
+
+document.getElementById('cropImage1').addEventListener('click', function () {
+   const croppedCanvas = cropper1.getCroppedCanvas();
+   croppedCanvas.toBlob(function (blob) {
+       const file = new File([blob], 'cropped_image1.jpg', { type: 'image/jpeg' });
+       const dataTransfer = new DataTransfer();
+       dataTransfer.items.add(file);
+       document.getElementById('file1').files = dataTransfer.files; // Set the cropped image in the file input
+
+       // **Set the cropped image as preview**
+            const croppedImageURL = URL.createObjectURL(blob); // Create a preview URL
+            const previewElement = document.getElementById('croppedPreview1'); // Get preview image element
+            previewElement.src = croppedImageURL; // Set preview source
+            previewElement.style.display = "block"; // Ensure it's visible
+   });
+
+   $('#cropperModal1').modal('hide'); // Close the modal after cropping
+});
+
+document.getElementById('cropImage2').addEventListener('click', function () {
+   const croppedCanvas = cropper2.getCroppedCanvas();
+   croppedCanvas.toBlob(function (blob) {
+       const file = new File([blob], 'cropped_image2.jpg', { type: 'image/jpeg' });
+       const dataTransfer = new DataTransfer();
+       dataTransfer.items.add(file);
+       document.getElementById('file2').files = dataTransfer.files;
+
+       // **Set the cropped image as preview**
+            const croppedImageURL = URL.createObjectURL(blob); // Create a preview URL
+            const previewElement = document.getElementById('croppedPreview2'); // Get preview image element
+            previewElement.src = croppedImageURL; // Set preview source
+            previewElement.style.display = "block"; // Ensure it's visible
+   });
+   $('#cropperModal2').modal('hide');
+});
+
+document.getElementById('cropImage3').addEventListener('click', function () {
+   const croppedCanvas = cropper3.getCroppedCanvas();
+   croppedCanvas.toBlob(function (blob) {
+       const file = new File([blob], 'cropped_image3.jpg', { type: 'image/jpeg' });
+       const dataTransfer = new DataTransfer();
+       dataTransfer.items.add(file);
+       document.getElementById('file3').files = dataTransfer.files;
+
+       // **Set the cropped image as preview**
+            const croppedImageURL = URL.createObjectURL(blob); // Create a preview URL
+            const previewElement = document.getElementById('croppedPreview3'); // Get preview image element
+            previewElement.src = croppedImageURL; // Set preview source
+            previewElement.style.display = "block"; // Ensure it's visible
+   });
+   $('#cropperModal3').modal('hide');
+});
+
+
+</script>
+</body>
+</html>

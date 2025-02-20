@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homely - Organic Products</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+
+        .navbar {
+            padding: 15px 0;
+            background: white;
+        }
+
+        .brand-logo {
+            height: 40px;
+        }
+
+        footer {
+            background: #2E8B57;
+            color: white;
+            padding: 40px 0 20px;
+        }
+
+        footer h5 {
+            margin-bottom: 20px;
+        }
+
+        footer ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        footer ul li {
+            margin-bottom: 10px;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <div class="d-flex">
+            <a class="navbar-brand" href="/">
+                <img src="/images/logo.png" alt="Homely" class="brand-logo">
+            </a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ml-5">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/products">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/wallet">Wallet</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex align-items-center">
+            <form class="d-flex me-3">
+                <input class="form-control" type="search" placeholder="Search">
+            </form>
+            <a href="/wishlist" class="me-3"><i class="far fa-heart"></i></a>
+            <a href="/cart/view-cart" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle fa-lg"></i> <!-- Profile Icon -->
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" th:href="@{/view-profile}">View Profile</a></li>
+                    <li><a class="dropdown-item" th:href="@{/view-orders}">View Orders</a></li>
+                    <li><a class="dropdown-item" th:href="@{/update-password}">Update Password</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div th:if="${order.latestStatus.status!='Cancelled'}">
+    <h3>Order Status - Order #<span th:text="${order.id}"></span></h3>
+    <div class="d-flex justify-content-between mb-2 mt-5">
+        <span class="badge bg-secondary text-white me-2">Order placed</span>
+        <span class="badge bg-secondary text-white me-2">Confirmed</span>
+        <span class="badge bg-secondary text-white me-2">In Transit</span>
+        <span class="badge bg-secondary text-white me-2">Delivered</span>
+
+    </div>
+    <div class="progress" style="height: 30px;">
+        <div class="progress-bar bg-success"
+             role="progressbar"
+             th:style="'width: ' + ${order.orderStatuses.size() * 25} + '%'"
+             th:if="${order.orderStatuses != null and !order.orderStatuses.isEmpty()}"
+             th:text="${order.latestStatus.status}">
+        </div>
+    </div>
+    </div>
+    <div th:if="${order.latestStatus.status =='Cancelled'}" class="mt-4">
+        <p>Your Order has been cancelled!</p>
+    </div>
+    <ul class="list-group mt-3">
+        <li class="list-group-item" th:each="status : ${order.orderStatuses}">
+            <span th:text="${status.status} + ' on'"></span>
+            <span th:if="${status.statusChangeDate != null}"
+                  th:text="${#temporals.format(status.statusChangeDate, 'yyyy-MM-dd HH:mm')}"></span>
+            <span th:if="${status.statusChangeDate == null}">Date not available</span>
+        </li>
+    </ul>
+</div>
+
+
+<!-- Footer -->
+<footer class="mt-5 mt-auto">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <h5>About Us</h5>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Customer Service</h5>
+                <ul>
+                    <li><a href="#">Return Policy</a></li>
+                    <li><a href="#">About Shipping</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Contact Us</h5>
+                <ul>
+                    <li>Ernakulam, Kottayam</li>
+                    <li>+91 9876543210</li>
+                    <li>homely@example.com</li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Get In Touch</h5>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homely - Organic Products</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+
+        .navbar {
+                    padding: 15px 0;
+                    background: white;
+                }
+
+                .brand-logo {
+                    height: 40px;
+                }
+
+                .hero-banner {
+                    height: 400px;
+                    background-size: cover;
+                    background-position: center;
+                    position: relative;
+                }
+
+                .features-bar {
+                    padding: 20px 0;
+                    align-items: center;
+                }
+
+                .feature-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .feature-icon {
+                    width: 40px;
+                    height: 40px;
+                    background: #2E8B57;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                }
+
+                .category-title {
+                    color: #2E8B57;
+                    margin: 30px 0 20px;
+                    font-weight: 600;
+                }
+
+                .product-card {
+                    border: 1px solid #eee;
+                    padding: 15px;
+                    text-align: center;
+                    margin-bottom: 20px;
+                    position: relative;
+                    background-color:#f3fff3;
+                }
+
+                .card-link{
+                text-decoration: none;
+                color: white;
+                font-size: 14px;
+                }
+
+                .product-card img {
+                    max-width: 100%;
+                    height: auto;
+                    margin-bottom: 10px;
+                }
+
+                .product-title {
+                    font-size: 0.9rem;
+                    margin: 10px 0;
+                    color: black;
+                }
+
+                .product-price {
+                    color: red;
+                    font-weight: 600;
+                    text-decoration:line-through;
+                }
+
+                .discount-price{
+                    color: #2E8B57;
+                    font-weight:600;
+                }
+
+                .wishlist-btn {
+                    position: absolute;
+                    right: 10px;
+                    top: 10px;
+                    background: #2E8B57;
+                    color: white;
+                    border: none;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .buy-now-btn {
+                    background: #2E8B57;
+                    color: white;
+                    border: none;
+                    padding: 8px 20px;
+                    border-radius: 5px;
+                    width: 100%;
+                }
+                .soldout-btn{
+                    background: #2E8B57;
+                    color: white;
+                    border: none;
+                    padding: 8px 20px;
+                    border-radius: 5px;
+                    width: 100%;
+                    cursor: not-allowed;
+                    opacity: 0.6;
+                }
+
+                footer {
+                    background: #2E8B57;
+                    color: white;
+                    padding: 40px 0 20px;
+                }
+
+                footer h5 {
+                    margin-bottom: 20px;
+                }
+
+                footer ul {
+                    list-style: none;
+                    padding: 0;
+                }
+
+                footer ul li {
+                    margin-bottom: 10px;
+                }
+
+                footer a {
+                    color: white;
+                    text-decoration: none;
+                }
+
+                .social-icons {
+                    display: flex;
+                    gap: 15px;
+                    margin-top: 20px;
+                }
+
+          .filter-sidebar {
+            background: white;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+
+        .filter-title {
+            font-weight: 600;
+            margin: 15px 0 10px;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-section label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+         .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        .sidebar {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .list-group-item {
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .list-group-item:hover {
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+        .list-group-item.active {
+            background-color: black;
+            color: white;
+            border-color: black;
+        }
+        .wishlist-btn i.wishlist-added {
+               color: red; /* Change to red when added */
+         }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <div class="d-flex">
+            <a class="navbar-brand" href="/">
+                <img src="/images/logo.png" alt="Homely" class="brand-logo">
+            </a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ml-5">
+                <li class="nav-item">
+                    <a class="nav-link" href="/home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/products">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/wallet">Wallet</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex align-items-center">
+            <form class="d-flex me-3" th:action="@{/products/search}">
+                <input class="form-control" name="query" type="search" id="searchInput" placeholder="Search">
+                <!-- Preserve Selected Filters -->
+                <th:block th:each="category : ${selectedCategories}">
+                    <input type="hidden" name="categories" th:value="${category}">
+                </th:block>
+
+                <input type="hidden" name="priceRange" th:value="${selectedPriceRange}">
+
+                <th:block th:each="quantity : ${selectedQuantities}">
+                    <input type="hidden" name="quantities" th:value="${quantity}">
+                </th:block>
+                <button style="opacity:0.6; margin-left: 3px" class="btn bt-sm btn-primary" type="submit"><i class="fas fa-search"></i></button>
+            </form>
+            <a href="/wishlist" class="me-3"><i class="far fa-heart"></i></a>
+            <a href="/cart/view-cart" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle fa-lg"></i> <!-- Profile Icon -->
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" th:href="@{/view-profile}">View Profile</a></li>
+                    <li><a class="dropdown-item" th:href="@{/view-orders}">View Orders</a></li>
+                    <li><a class="dropdown-item" th:href="@{/update-password}">Update Password</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+
+<div class="container">
+
+    <div class="row">
+        <!-- Filter Sidebar -->
+        <div class="col-md-3">
+            <div class="filter-sidebar">
+
+                <!-- Price Range Sort -->
+                <div class="card sidebar mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Price Range</h5>
+                        <div class="list-group">
+                            <a th:href="@{'/products'}"
+                               th:classappend="${priceSort == null} ? 'active' : ''"
+                               class="list-group-item list-group-item-action">
+                                <i class="fas fa-filter me-2"></i>All
+                            </a>
+                            <a th:href="@{'/products?priceSort=' + ${false}}"
+                               th:classappend="${priceSort == false} ? 'active' : ''"
+                               class="list-group-item list-group-item-action">
+                                <i class="fas fa-arrow-up me-2"></i>Low to High
+                            </a>
+                            <a th:href="@{'/products?priceSort=' + ${true}}"
+                               th:classappend="${priceSort == true} ? 'active' : ''"
+                               class="list-group-item list-group-item-action">
+                                <i class="fas fa-arrow-down me-2"></i>High to Low
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alphabetical Sort -->
+                <div class="card sidebar mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Alphabetical</h5>
+                        <div class="list-group">
+                            <a th:href="@{'/products'}"
+                               th:classappend="${letterSort == null} ? 'active' : ''"
+                               class="list-group-item list-group-item-action">
+                                <i class="fas fa-list me-2"></i>All
+                            </a>
+                            <a th:href="@{'/products?letterSort=' + ${true}}"
+                               th:classappend="${letterSort == true} ? 'active' : ''"
+                               class="list-group-item list-group-item-action">
+                                <i class="fas fa-sort-alpha-down me-2"></i>aA - zZ
+                            </a>
+                            <a th:href="@{'/products?letterSort=' + ${false}}"
+                               th:classappend="${letterSort == false} ? 'active' : ''"
+                               class="list-group-item list-group-item-action">
+                                <i class="fas fa-sort-alpha-up me-2"></i>zZ - aA
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alphabetical Sort -->
+                <div class="card sidebar mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Ratings</h5>
+                        <div class="list-group">
+                            <a th:href="@{'/products'}"
+                               th:classappend="${ratingSort == null} ? 'active' : ''"
+                               class="list-group-item list-group-item-action">
+                                <i class="fas fa-list me-2"></i>All
+                            </a>
+                            <a th:href="@{'/products?ratingSort=' + ${true}}"
+                               th:classappend="${ratingSort == true} ? 'active' : ''"
+                               class="list-group-item list-group-item-action">
+                                <i class="fas fa-arrow-down me-2"></i>High to Low
+                            </a>
+                            <a th:href="@{'/products?ratingSort=' + ${false}}"
+                               th:classappend="${ratingSort == false} ? 'active' : ''"
+                               class="list-group-item list-group-item-action">
+                                <i class="fas fa-arrow-up me-2"></i>Low to High
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--filter section-->
+                <form th:action="@{/filter}" method="get">
+
+                <div class="filter-section">
+                    <h5 class="filter-title">CATEGORIES</h5>
+                    <div class="checkbox-wrapper" th:each="category: ${categories}">
+                        <input type="checkbox" id="cate" name="categories" th:value="${category.categoryname}"
+                               th:checked="${selectedCategories != null and selectedCategories.contains(category.categoryname)}">
+                        <label for="cate" th:text="${category.categoryname}">Spices</label>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h5 class="filter-title">PRICE</h5>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" name="priceRange" th:value="'0-50'"
+                               th:checked="${selectedPriceRange != null and selectedPriceRange.equals('0-50')}">
+                        <label>Below 50</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" name="priceRange" th:value="'50-100'"
+                               th:checked="${selectedPriceRange != null and selectedPriceRange.equals('50-100')}">
+                        <label>50-100</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" name="priceRange" th:value="'100-150'"
+                               th:checked="${selectedPriceRange != null and selectedPriceRange.equals('100-150')}">
+                        <label>100-150</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" name="priceRange" th:value="'150-200'"
+                               th:checked="${selectedPriceRange != null and selectedPriceRange.equals('150-200')}">
+                        <label>150-200</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" name="priceRange" th:value="'200-500'"
+                               th:checked="${selectedPriceRange != null and selectedPriceRange.equals('200-500')}">
+                        <label>Above 200</label>
+                    </div>
+
+                </div>
+
+                <div class="filter-section">
+                    <h5 class="filter-title">QUANTITY</h5>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="qty1" name="quantities" th:value="50g"
+                               th:checked="${selectedQuantities != null and selectedQuantities.contains('50g')}">
+                        <label for="qty1">50g</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="qty2" name="quantities" th:value="100g"
+                               th:checked="${selectedQuantities != null and selectedQuantities.contains('100g')}">
+                        <label for="qty2">100g</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="qty3" name="quantities" th:value="250g"
+                               th:checked="${selectedQuantities != null and selectedQuantities.contains('250g')}">
+                        <label for="qty3">250g</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="qty4" name="quantities" th:value="500g"
+                               th:checked="${selectedQuantities != null and selectedQuantities.contains('500g')}">
+                        <label for="qty4">500g</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="qty5" name="quantities" th:value="1kg"
+                               th:checked="${selectedQuantities != null and selectedQuantities.contains('1kg')}">
+                        <label for="qty5">1kg</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="qty6" name="quantities" th:value="2kg"
+                               th:checked="${selectedQuantities != null and selectedQuantities.contains('2kg')}">
+                        <label for="qty6">5kg</label>
+                    </div>
+                </div>
+                    <button type="submit" class="btn btn-primary">Apply Filter</button>
+                </form>
+            </div>
+
+        </div>
+        <div class="col-md-9">
+            <h3 class="category-title">Our Products</h3>
+            <div id="productListContainer" data-total-products="${products.size()}" data-page-size="4">
+            <div th:fragment="productList">
+                <div class="row" id="productList">
+                    <div class="col-md-3" th:each="product : ${products}">
+                        <div class="product-card">
+                            <input type="hidden" class="productId" th:value="${product.id}">
+                            <img th:if="${product.images != null and product.images.size() > 0}" th:src="${product.images[0]}" alt="Product">
+                            <img th:if="${product.images == null or product.images.size() == 0}" th:src="@{/images/imageplaceholder.jpg}" alt="Product">
+                            <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                            <h5 class="product-title" th:text="${product.name}">Chili powder</h5>
+                            <span class="discount-price" th:text="${'₹' + product.discountprice}">₹99.00</span>
+                            <span class="product-price" th:text="${'₹' + product.price}">₹99.00</span>
+                            <button class="buy-now-btn">
+                                <a th:href="@{/productDetails/{id}(id=${product.id})}" class="card-link">VIEW DETAILS</a>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="pagination justify-content-center" id="pagination"></ul>
+           </div>
+       </div>
+   </div>
+</div>
+
+
+<!-- Footer -->
+<footer class="mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <h5>About Us</h5>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Customer Service</h5>
+                <ul>
+                    <li><a href="#">Return Policy</a></li>
+                    <li><a href="#">About Shipping</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Contact Us</h5>
+                <ul>
+                    <li>Ernakulam, Kottayam</li>
+                    <li>+91 9876543210</li>
+                    <li>homely@example.com</li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Get In Touch</h5>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll(".wishlist-btn").forEach(btn => {
+       btn.addEventListener("click", function () {
+
+    let productId = this.closest(".product-card").querySelector(".productId").value;
+   console.log(productId);
+
+           fetch(`/wishlist/add?productId=${productId}`, {
+               method: "POST",
+               headers: {
+                   "Content-Type": "application/json"
+               }
+           })
+           .then(response => response.json())
+           .then(data => {
+               if (data.success) {
+                   let icon = this.querySelector("i");
+                   icon.classList.toggle("wishlist-added");
+               }
+           })
+           .catch(error => console.error("Error adding to wishlist:", error));
+   });
+  });
+
+
+   const productList = document.getElementById("productList"); // Ensure this is the correct ID
+    const paginationContainer = document.getElementById("pagination");
+
+    if (!productList || !paginationContainer) {
+        console.error("Error: Missing required elements (#productList or #pagination).");
+        return;
+    }
+
+    const products = Array.from(productList.children);
+    const pageSize = 8; // Number of products per page
+    let currentPage = 0;
+    const totalPages = Math.ceil(products.length / pageSize);
+
+    function showPage(page) {
+        if (page < 0 || page >= totalPages) return; // Prevent invalid page navigation
+
+        products.forEach((product, index) => {
+            product.style.display = (index >= page * pageSize && index < (page + 1) * pageSize) ? "block" : "none";
+        });
+
+        currentPage = page;
+        updatePagination();
+    }
+
+    function updatePagination() {
+        paginationContainer.innerHTML = "";
+
+        let prevButton = document.createElement("li");
+        prevButton.className = "page-item" + (currentPage === 0 ? " disabled" : "");
+        prevButton.innerHTML = `<a class="page-link" href="#">«</a>`;
+        prevButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            if (currentPage > 0) showPage(currentPage - 1);
+        });
+        paginationContainer.appendChild(prevButton);
+
+        for (let i = 0; i < totalPages; i++) {
+            let pageButton = document.createElement("li");
+            pageButton.className = "page-item" + (i === currentPage ? " active" : "");
+            pageButton.innerHTML = `<a class="page-link" href="#">${i + 1}</a>`;
+            pageButton.addEventListener("click", function (event) {
+                event.preventDefault();
+                showPage(i);
+            });
+            paginationContainer.appendChild(pageButton);
+        }
+
+        let nextButton = document.createElement("li");
+        nextButton.className = "page-item" + (currentPage === totalPages - 1 ? " disabled" : "");
+        nextButton.innerHTML = `<a class="page-link" href="#">»</a>`;
+        nextButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            if (currentPage < totalPages - 1) showPage(currentPage + 1);
+        });
+        paginationContainer.appendChild(nextButton);
+    }
+
+    showPage(0); // Initialize first page
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Page</title>
+    <!-- Cropper.js library -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+
+        .sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            min-height: 100vh;
+            background: #343a40;
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 15px 20px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active {
+            background: #48a87d;
+            color: #fff;
+        }
+
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .profile-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            width: 100%;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+
+        .admin-header {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .profile-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #48a87d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            margin-right: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -250px;
+            }
+            .sidebar.active {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="profile-section">
+            <div class="d-flex align-items-center">
+                <div class="profile-image">
+                    <i class="bi bi-person"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0">Welcome Admin!</h6>
+
+                </div>
+            </div>
+        </div>
+
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a th:href="@{/admin/dashboard}" class="nav-link" th:classappend="${currentPage == 'dashboard'} ? 'active' : ''">
+
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/report}" class="nav-link" th:classappend="${currentPage == 'report'} ? 'active' : ''">
+
+                    Sales Report
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/users}" class="nav-link" th:classappend="${currentPage == 'users'} ? 'active' : ''">
+
+                    User Management
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/categories}" class="nav-link" th:classappend="${currentPage == 'categories'} ? 'active' : ''">
+
+                    Category Management
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/products}" class="nav-link" th:classappend="${currentPage == 'products'} ? 'active' : ''">
+
+                    Product Management
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/orders}" class="nav-link" th:classappend="${currentPage == 'orders'} ? 'active' : ''">
+
+                    Order Management
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/returns}" class="nav-link" th:classappend="${currentPage == 'returns'} ? 'active' : ''">
+
+                    Returns Management
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/inventory}" class="nav-link" th:classappend="${currentPage == 'inventory'} ? 'active' : ''">
+
+                    Inventory Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/coupons}" class="nav-link" th:classappend="${currentPage == 'coupons'} ? 'active' : ''">
+
+                    Coupon Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/offers}" class="nav-link" th:classappend="${currentPage == 'offers'} ? 'active' : ''">
+
+                    Offer Management
+                </a>
+            </li>
+
+
+            <li class="nav-item mt-auto">
+                <form th:action="@{/logout}" method="post" class="nav-link">
+                    <button type="submit" class="btn nav-link text-left p-0 w-100">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="admin-header p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <button class="btn btn-light d-md-none" id="sidebarCollapse">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h4 class="mb-0">Product Management</h4>
+                <div class="d-flex align-items-center">
+                        <span class="me-3" th:text="${#temporals.format(#temporals.createNow(), 'dd MMM yyyy')}">
+                            Date
+                        </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="container-fluid p-4">
+            <!-- Success Message -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <p th:text="${successMessage}"></p>
+            </div>
+
+            <!-- Error Message -->
+            <div th:if="${errorMessage}" class="alert alert-danger">
+                <p th:text="${errorMessage}"></p>
+            </div>
+            <!-- Search Form -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <form th:action="@{/admin/searchProduct}" method="get" class="d-flex">
+                        <input type="text" name="keyword" class="form-control me-2" placeholder="Search products..." />
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
+                </div>
+                <div class="col-md-6 text-end">
+                   <!-- <button class="btn btn-success" id="addProduct" data-bs-toggle="modal" data-bs-target="#createProductModal">Add Product</button> -->
+                    <a class="btn btn-success" id="addProduct" href="/admin/add-product" >Add Product</a>
+
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>SKU</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Discount Price</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Loop through users -->
+                        <tr th:each="product : ${products}">
+                            <td th:text="${product.name}"></td>
+                            <td th:text="${product.sku}"></td>
+                            <td th:text="${product.description}"></td>
+                            <td th:text="${product.category.categoryname}"></td>
+                            <td th:text="${product.price}"></td>
+                            <td th:text="${product.discountprice}"></td>
+                            <td>
+                                <a class="btn-sm" th:href="@{/admin/editProduct/{id}(id=${product.id})}"><i class="fa fa-edit"></i></a>
+                                <form th:action="@{/admin/deleteProduct/{id}(id=${product.id})}" method="post" class="d-inline" onsubmit="return confirmDelete(this);">
+                                    <input type="hidden" name="_method" value="DELETE"/>
+                                    <button type="submit" class="btn-sm btn-danger">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Create Product Modal -->
+<div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="createProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/admin/products}" method="post" id="imageForm" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createProductModalLabel">Add New Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="productname" class="form-label">Product Name</label>
+                        <input type="text" name="name" id="productname" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sku" class="form-label">SKU</label>
+                        <input type="text" name="sku" id="sku" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <input type="text" name="description" id="description" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select name="category" id="category" class="form-control" required>
+                            <!-- Placeholder option -->
+                            <option value="" disabled selected>Select a category</option>
+
+                            <option th:each="category : ${categories}"
+                                    th:value="${category.id}"
+                                    th:text="${category.categoryname}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Base Price</label>
+                        <input type="text" name="price" id="price" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="discount" class="form-label">Base Discount Price</label>
+                        <input type="text" name="discountprice" id="discount" class="form-control" required>
+                    </div>
+                    <div id="quantityContainer">
+                        <p>Add available quantities</p>
+                        <div class="quantity-row">
+                            <input type="text" name="quantity" class="form-control" placeholder="Quantity" required>
+                            <input type="text" name="qprice" class="form-control" placeholder="Price" required>
+                            <input type="number" name="qstock" class="form-control" placeholder="Stock" required>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-sm btn-success mb-3" onclick="addQuantityRow()">Add More Quantities</button>
+
+                    <!-- Image Upload -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="file1">Upload Image 1</label>
+                            <input type="file" id="file1" name="file1" class="form-control" accept="image/*" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="file2">Upload Image 2</label>
+                            <input type="file" id="file2" name="file2" class="form-control" accept="image/*" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="file3">Upload Image 3</label>
+                            <input type="file" id="file3" name="file3" class="form-control" accept="image/*" required>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Image Upload Modals for Cropping -->
+<!-- Modal for Image 1 -->
+<div class="modal fade" id="cropperModal1" tabindex="-1" role="dialog" aria-labelledby="cropperModalLabel1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropperModalLabel1">Crop Image 1</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="image1" src="" alt="Image 1">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="cropImage1">Crop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Image 2 -->
+<div class="modal fade" id="cropperModal2" tabindex="-1" role="dialog" aria-labelledby="cropperModalLabel2" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropperModalLabel2">Crop Image 2</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="image2" src="" alt="Image 2">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="cropImage2">Crop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Image 3 -->
+<div class="modal fade" id="cropperModal3" tabindex="-1" role="dialog" aria-labelledby="cropperModalLabel3" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropperModalLabel3">Crop Image 3</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="image3" src="" alt="Image 3">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="cropImage3">Crop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('sidebarCollapse').addEventListener('click', function() {
+        document.querySelector('.sidebar').classList.toggle('active');
+    });
+
+
+    function addQuantityRow() {
+        let container = document.getElementById("quantityContainer");
+        let newRow = document.createElement("div");
+        newRow.classList.add("quantity-row");
+        newRow.innerHTML = `
+            <input type="text" name="quantity" class="form-control" placeholder="Quantity" required>
+            <input type="text" name="qprice" class="form-control" placeholder="Price" required>
+            <input type="number" name="qstock" class="form-control" placeholder="Stock" required>
+        `;
+        container.appendChild(newRow);
+    }
+
+ // Initialize Cropper.js for all images
+    let cropper1, cropper2, cropper3;
+
+    function initializeCropper(imageId) {
+        return new Cropper(document.getElementById(imageId), {
+            aspectRatio: 1,  // Optional: make it square
+            viewMode: 1, // Ensure the image fits within the container
+            scalable: true,
+            zoomable: true
+        });
+    }
+
+    document.getElementById('file1').addEventListener('change', function (event) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var imageElement = document.getElementById('image1');
+            imageElement.src = e.target.result;
+            $('#cropperModal1').modal('show');
+            if (cropper1) cropper1.destroy();  // Destroy any previous instance
+            cropper1 = initializeCropper('image1');
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    });
+
+    document.getElementById('file2').addEventListener('change', function (event) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var imageElement = document.getElementById('image2');
+            imageElement.src = e.target.result;
+            $('#cropperModal2').modal('show');
+            if (cropper2) cropper2.destroy();
+            cropper2 = initializeCropper('image2');
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    });
+
+    document.getElementById('file3').addEventListener('change', function (event) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var imageElement = document.getElementById('image3');
+            imageElement.src = e.target.result;
+            $('#cropperModal3').modal('show');
+            if (cropper3) cropper3.destroy();
+            cropper3 = initializeCropper('image3');
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    });
+
+
+ document.getElementById('cropImage1').addEventListener('click', function () {
+    const croppedCanvas = cropper1.getCroppedCanvas();
+    croppedCanvas.toBlob(function (blob) {
+        const file = new File([blob], 'cropped_image1.jpg', { type: 'image/jpeg' });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        document.getElementById('file1').files = dataTransfer.files; // Set the cropped image in the file input
+    });
+    $('#cropperModal1').modal('hide'); // Close the modal after cropping
+});
+
+document.getElementById('cropImage2').addEventListener('click', function () {
+    const croppedCanvas = cropper2.getCroppedCanvas();
+    croppedCanvas.toBlob(function (blob) {
+        const file = new File([blob], 'cropped_image2.jpg', { type: 'image/jpeg' });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        document.getElementById('file2').files = dataTransfer.files;
+    });
+    $('#cropperModal2').modal('hide');
+});
+
+document.getElementById('cropImage3').addEventListener('click', function () {
+    const croppedCanvas = cropper3.getCroppedCanvas();
+    croppedCanvas.toBlob(function (blob) {
+        const file = new File([blob], 'cropped_image3.jpg', { type: 'image/jpeg' });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        document.getElementById('file3').files = dataTransfer.files;
+    });
+    $('#cropperModal3').modal('hide');
+});
+
+
+    function confirmDelete(form) {
+    return confirm("Are you sure you want to delete this product?");
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Page</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+
+        .sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            min-height: 100vh;
+            background: #343a40;
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 15px 20px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active {
+            background: #48a87d;
+            color: #fff;
+        }
+
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .profile-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            width: 100%;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+
+        .admin-header {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .profile-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #48a87d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            margin-right: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -250px;
+            }
+            .sidebar.active {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="profile-section">
+            <div class="d-flex align-items-center">
+                <div class="profile-image">
+                    <i class="bi bi-person"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0">Welcome Admin!</h6>
+
+                </div>
+            </div>
+        </div>
+
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a th:href="@{/admin/dashboard}" class="nav-link" th:classappend="${currentPage == 'dashboard'} ? 'active' : ''">
+
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/report}" class="nav-link" th:classappend="${currentPage == 'report'} ? 'active' : ''">
+
+                    Sales Report
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/users}" class="nav-link" th:classappend="${currentPage == 'users'} ? 'active' : ''">
+
+                    User Management
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/categories}" class="nav-link" th:classappend="${currentPage == 'categories'} ? 'active' : ''">
+
+                    Category Management
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/products}" class="nav-link" th:classappend="${currentPage == 'products'} ? 'active' : ''">
+
+                    Product Management
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/orders}" class="nav-link" th:classappend="${currentPage == 'orders'} ? 'active' : ''">
+
+                    Order Management
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/returns}" class="nav-link" th:classappend="${currentPage == 'returns'} ? 'active' : ''">
+
+                    Returns Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/inventory}" class="nav-link" th:classappend="${currentPage == 'inventory'} ? 'active' : ''">
+
+                    Inventory Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/coupons}" class="nav-link" th:classappend="${currentPage == 'coupons'} ? 'active' : ''">
+
+                    Coupon Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/offers}" class="nav-link" th:classappend="${currentPage == 'offers'} ? 'active' : ''">
+
+                    Offer Management
+                </a>
+            </li>
+
+            <li class="nav-item mt-auto">
+                <form th:action="@{/logout}" method="post" class="nav-link">
+                    <button type="submit" class="btn nav-link text-left p-0 w-100">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="admin-header p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <button class="btn btn-light d-md-none" id="sidebarCollapse">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h4 class="mb-0">Order Management</h4>
+                <div class="d-flex align-items-center">
+                        <span class="me-3" th:text="${#temporals.format(#temporals.createNow(), 'dd MMM yyyy')}">
+                            Date
+                        </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="container-fluid p-4">
+            <!-- Search Form -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <form th:action="@{/admin/searchOrders}" method="get" class="d-flex">
+                        <input type="text" name="keyword" class="form-control me-2" placeholder="Search Orders..." />
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
+                </div>
+
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Order Date</th>
+                            <th>SKUs</th>
+                            <th>Delivery Fee</th>
+                            <th>Total Amount</th>
+                            <th>Item Count</th>
+                            <th>User Id</th>
+                            <th>Address Id</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Loop through users -->
+                        <tr th:each="order : ${orders}">
+                            <td th:text="'#' + ${order.id}"></td>
+                            <td th:text="${order.orderDate}"></td>
+                            <td>
+                                <ul>
+                                    <li style="list-style-type: none" th:each="item : ${order.orderItems}">
+                                        <p th:text="${item.product.sku}">SKU</p>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td th:text="${order.deliveryFee}"></td>
+                            <td th:text="${order.totalAmount}"></td>
+                            <td th:text="${order.productCount}"></td>
+                            <td th:text="${order.user.id}"></td>
+                            <td th:text="${order.address.id}"></td>
+                            <td>
+                                <form method="post" th:action="@{/orders/{orderId}/update-status(orderId=${order.id})}" class="d-inline">
+                                    <select class="form-select form-select-sm" name="status" onchange="this.form.submit()">
+                                        <option th:each="status : ${statusList}"
+                                                th:value="${status.status}"
+                                                th:text="${status.status}"
+                                                th:selected="${order.latestStatus != null and order.latestStatus.status == status.status}"
+                                                th:if="(${order.latestStatus.status == 'Confirmed'} and ${status.status!='Order placed'})
+                                                         or (${order.latestStatus.status == 'In Transit'} and ${status.status!='Order placed'} and ${status.status!='Confirmed'} and ${status.status!='Payment Pending'})
+                                                         or (${order.latestStatus.status == 'Delivered'} and ${status.status =='Delivered'})
+                                                         or (${order.latestStatus.status == 'Cancelled'} and ${status.status =='Cancelled'})
+                                                         or (${order.latestStatus.status == 'Order placed'} and ${status.status!='Payment Pending'})
+                                                         or ${order.latestStatus.status =='Payment Pending'}">
+                                        </option>
+                                    </select>
+                                    <input type="hidden" name="orderId" th:value="${order.id}" />
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('sidebarCollapse').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+
+    </script>
+
+</body>
+</html>

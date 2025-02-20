@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Coupons</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+
+        .navbar {
+           padding: 15px 0;
+           background: white;
+       }
+
+       .brand-logo {
+           height: 40px;
+       }
+
+       footer {
+           background: #2E8B57;
+           color: white;
+           padding: 40px 0 20px;
+       }
+
+       footer h5 {
+           margin-bottom: 20px;
+       }
+
+       footer ul {
+           list-style: none;
+           padding: 0;
+       }
+
+       footer ul li {
+           margin-bottom: 10px;
+       }
+
+       footer a {
+           color: white;
+           text-decoration: none;
+       }
+
+       .social-icons {
+           display: flex;
+           gap: 15px;
+           margin-top: 20px;
+       }
+
+       .coupon-card {
+           display: flex;
+           align-items: center;
+           justify-content: space-between;
+           border-radius: 10px;
+           padding: 15px;
+           margin-bottom: 15px;
+       }
+       .coupon-code {
+           display: flex;
+           align-items: center;
+           gap: 10px;
+           border-radius: 20px;
+           padding: 5px 10px;
+           font-size: 16px;
+           font-weight: bold;
+       }
+       .icon {
+           font-size: 18px;
+           cursor: pointer;
+       }
+       .yellow { background-color: #ffe066; }
+       .green { background-color: #caff70; }
+       .blue { background-color: #69e0ff; }
+       .pink { background-color: #ffb6c1; }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <div class="d-flex">
+            <a class="navbar-brand" href="/">
+                <img src="/images/logo.png" alt="Homely" class="brand-logo">
+            </a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ml-5">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/products">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/wallet">Wallet</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex align-items-center">
+            <form class="d-flex me-3">
+                <input class="form-control" type="search" placeholder="Search">
+            </form>
+            <a href="/wishlist" class="me-3"><i class="far fa-heart"></i></a>
+            <a href="/cart/view-cart" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle fa-lg"></i> <!-- Profile Icon -->
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" th:href="@{/view-profile}">View Profile</a></li>
+                    <li><a class="dropdown-item" th:href="@{/view-orders}">View Orders</a></li>
+                    <li><a class="dropdown-item" th:href="@{/update-password}">Update Password</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <h2 class="mb-4">Available Coupons</h2>
+
+    <div th:each="coupon, iterStat : ${coupons}"
+         th:classappend="${iterStat.index % 4 == 0} ? 'yellow' :
+                            (${iterStat.index % 4 == 1} ? 'green' :
+                            (${iterStat.index % 4 == 2} ? 'blue' : 'pink'))"
+         class="coupon-card">
+        <div class="coupon-code">
+            <span>⚙️</span>
+            <span th:text="${coupon.code}">XMAS10</span>
+            <span class="icon" onclick="copyToClipboard(this)">
+                    <i class="bi bi-copy"></i>
+                </span>
+            <span th:if="${coupon.status == 'INACTIVE'
+                     || coupon.startDate.isAfter(#temporals.createNow().toLocalDate())
+                     || coupon.endDate.isBefore(#temporals.createNow().toLocalDate())}"
+                  class="badge bg-danger">Inactive</span>
+        </div>
+        <p th:text="${coupon.description}" class="text-muted fst-italic">For an order over 10€</p>
+        <div>
+            <span th:text="${'Minimum Purchase: ₹'+coupon.minPrice}">₹100</span>
+        </div>
+    </div>
+    <a th:href="@{/checkout}" class="btn btn-success mt-3">Back to Checkout</a>
+</div>
+
+<!-- Footer -->
+<footer class="mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <h5>About Us</h5>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Customer Service</h5>
+                <ul>
+                    <li><a href="#">Return Policy</a></li>
+                    <li><a href="#">About Shipping</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Contact Us</h5>
+                <ul>
+                    <li>Ernakulam, Kottayam</li>
+                    <li>+91 9876543210</li>
+                    <li>homely@example.com</li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Get In Touch</h5>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+<script>
+    function copyToClipboard(element) {
+        let code = element.previousElementSibling.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+            Swal.fire({
+                icon: "success",
+                title: "Coupon copied successfully!",
+                showConfirmButton: false,
+                timer: 1500
+                });
+        });
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</body>
+</html>

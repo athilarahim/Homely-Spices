@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homely - Organic Products</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+
+        :root {
+           --primary-green: #60B984;
+       }
+       .navbar {
+           padding: 15px 0;
+           background: white;
+       }
+
+       .brand-logo {
+           height: 40px;
+       }
+
+       footer {
+           background: #2E8B57;
+           color: white;
+           padding: 40px 0 20px;
+       }
+
+       footer h5 {
+           margin-bottom: 20px;
+       }
+
+       footer ul {
+           list-style: none;
+           padding: 0;
+       }
+
+       footer ul li {
+           margin-bottom: 10px;
+       }
+
+       footer a {
+           color: white;
+           text-decoration: none;
+       }
+
+       .social-icons {
+           display: flex;
+           gap: 15px;
+           margin-top: 20px;
+       }
+       .wallet-balance-card {
+           background: white;
+           border-radius: 10px;
+           padding: 2rem;
+           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+       }
+
+       .balance-amount {
+           font-size: 2.5rem;
+           font-weight: 500;
+           color: #333;
+       }
+
+
+       .wallet-history th {
+           background-color: var(--primary-green);
+           color: white;
+           font-weight: 500;
+       }
+
+       .table-container {
+            max-height: 200px; /* Adjust height as needed */
+            overflow-y: auto;  /* Enables vertical scrolling */
+            overflow-x: auto;  /* Enables horizontal scrolling if needed */
+            border: 1px solid #ddd; /* Optional: Adds border around the scrollable area */
+        }
+
+            .table-container thead {
+            position: sticky;
+            top: 0;
+            background: white; /* Ensure header visibility */
+            z-index: 2;
+        }
+
+
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <div class="d-flex">
+            <a class="navbar-brand" href="/">
+                <img src="/images/logo.png" alt="Homely" class="brand-logo">
+            </a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ml-5">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/products">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/wallet">Wallet</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex align-items-center">
+            <form class="d-flex me-3">
+                <input class="form-control" type="search" placeholder="Search">
+            </form>
+            <a href="/wishlist" class="me-3"><i class="far fa-heart"></i></a>
+            <a href="/cart/view-cart" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle fa-lg"></i> <!-- Profile Icon -->
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" th:href="@{/view-profile}">View Profile</a></li>
+                    <li><a class="dropdown-item" th:href="@{/view-orders}">View Orders</a></li>
+                    <li><a class="dropdown-item" th:href="@{/update-password}">Update Password</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <h3 class="mb-4">My Wallet</h3>
+
+    <div class="row">
+        <!-- Wallet Balance Card -->
+        <div class="col-md-4">
+            <div class="wallet-balance-card text-center shadow">
+                <h4 class="mb-4">Wallet Balance</h4>
+                <p class="balance-amount mb-4">₹<span th:if="${walletBalance!=null}" th:text="${transactions[0].walletBalance}">3500.00</span></p>
+            </div>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="col-md-8">
+            <h5>Wallet Transactions</h5>
+            <div class="table-container">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Wallet Balance</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="transaction : ${transactions}">
+                        <td th:text="${#temporals.format(transaction.transactionDate, 'yyyy-MM-dd HH:mm')}">25-12-24</td>
+                        <td th:text="${transaction.transactionType}">Credit</td>
+                        <td th:text="${transaction.transactionAmount}">2000</td>
+                        <td th:text="${transaction.walletBalance}">2000</td>
+                        <td th:text="${transaction.description}">2000</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="mt-5 mt-auto">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <h5>About Us</h5>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Customer Service</h5>
+                <ul>
+                    <li><a href="#">Return Policy</a></li>
+                    <li><a href="#">About Shipping</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Contact Us</h5>
+                <ul>
+                    <li>Ernakulam, Kottayam</li>
+                    <li>+91 9876543210</li>
+                    <li>homely@example.com</li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Get In Touch</h5>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+
+</script>
+</body>
+</html>

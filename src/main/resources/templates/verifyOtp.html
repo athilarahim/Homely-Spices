@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+
+        .navbar {
+            padding: 15px 0;
+            background: white;
+        }
+        .otp-card {
+            max-width: 400px;
+            margin: auto;
+            padding: 2rem;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background: white;
+        }
+
+        .otp-input-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.2rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f8f8f8;
+        }
+
+        .verify-btn {
+            background-color: #2E8B57;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 25px;
+            color: white;
+            font-weight: 500;
+        }
+
+        .verify-btn:hover {
+            background-color: #246B43;
+        }
+
+        .resend-link {
+            color: #2E8B57;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .timer {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .brand-logo {
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <div class="d-flex">
+            <a class="navbar-brand" href="/">
+                <img src="/images/logo.png" alt="Homely" class="brand-logo">
+            </a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ml-5">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/products">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/wallet">Wallet</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex align-items-center">
+            <form class="d-flex me-3">
+                <input class="form-control" type="search" placeholder="Search">
+            </form>
+            <a href="#" class="me-3"><i class="far fa-heart"></i></a>
+            <a href="#" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle fa-lg"></i> <!-- Profile Icon -->
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" th:href="@{/view-profile}">View Profile</a></li>
+                    <li><a class="dropdown-item" th:href="@{/view-orders}">View Orders</a></li>
+                    <li><a class="dropdown-item" th:href="@{/update-password}">Update Password</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="page-container">
+    <div class="container">
+        <div class="otp-card">
+            <h4 class="text-center mb-4">OTP Verification</h4>
+            <form th:action="@{/verifyOtp}" method="post">
+                <div class="otp-input-group">
+                    <input type="text" class="otp-input" maxlength="1" name="otp" id="otp1" autofocus>
+                    <input type="text" class="otp-input" maxlength="1" name="otp" id="otp2">
+                    <input type="text" class="otp-input" maxlength="1" name="otp" id="otp3">
+                    <input type="text" class="otp-input" maxlength="1" name="otp" id="otp4">
+                </div>
+
+                <button type="submit" class="verify-btn">Verify OTP</button>
+
+                <div class="text-center mt-4">
+                    <p class="mb-2">
+                        Didn't receive OTP? Click
+                        <a href="#" th:href="@{/resendOtp}" class="resend-link" onclick="resendOtp(); return false;" style="display: none;">Resend</a>
+                    </p>
+                    <p class="timer">02:00</p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    let timerInterval;
+    let timeLeft = 120; // 2 minutes in seconds
+
+    // Function to start the timer
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                document.querySelector('.timer').textContent = "00:00";
+                document.querySelector('.resend-link').style.display = 'inline'; // Show resend link
+            } else {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.querySelector('.timer').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                timeLeft--;
+            }
+        }, 1000);
+    }
+
+    // Function to resend OTP
+    async function resendOtp() {
+        try {
+            const response = await fetch('/resendOtp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: sessionStorage.getItem('email') }), // Store email in sessionStorage
+            });
+
+            if (response.ok) {
+                alert('OTP has been resent successfully!');
+                timeLeft = 120; // Reset timer
+                startTimer(); // Restart the timer
+                document.querySelector('.resend-link').style.display = 'none'; // Hide resend link
+            } else {
+                alert('Failed to resend OTP. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error resending OTP:', error);
+            alert('An error occurred while resending OTP.');
+        }
+    }
+
+    // Start the timer when the page loads
+    window.onload = () => {
+        startTimer();
+    };
+</script>
+</body>
+</html>

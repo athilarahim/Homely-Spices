@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homely - Organic Products</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+
+        .navbar {
+            padding: 15px 0;
+            background: white;
+        }
+
+        .brand-logo {
+            height: 40px;
+        }
+
+        footer {
+            background: #2E8B57;
+            color: white;
+            padding: 40px 0 20px;
+        }
+
+        footer h5 {
+            margin-bottom: 20px;
+        }
+
+        footer ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        footer ul li {
+            margin-bottom: 10px;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <div class="d-flex">
+            <a class="navbar-brand" href="/">
+                <img src="/images/logo.png" alt="Homely" class="brand-logo">
+            </a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ml-5">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/products">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/wallet">Wallet</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex align-items-center">
+            <form class="d-flex me-3">
+                <input class="form-control" type="search" placeholder="Search">
+            </form>
+            <a href="/wishlist" class="me-3"><i class="far fa-heart"></i></a>
+            <a href="/cart/view-cart" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle fa-lg"></i> <!-- Profile Icon -->
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" th:href="@{/view-profile}">View Profile</a></li>
+                    <li><a class="dropdown-item" th:href="@{/view-orders}">View Orders</a></li>
+                    <li><a class="dropdown-item" th:href="@{/update-password}">Update Password</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <div class="row">
+        <!-- Personal Info Section -->
+        <div class="col-md-6">
+            <h4>Personal Info</h4>
+            <form th:action="@{/view-profile/save}" th:object="${user}" method="post">
+                <input type="hidden" th:field="*{id}">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" id="nameField" class="form-control" th:value="${user.name}" th:field="*{name}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" id="usernameField" class="form-control" th:value="${user.username}" th:field="*{username}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="emailField" class="form-control" th:value="${user.email}" th:field="*{email}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phone No.</label>
+                    <input type="text" id="phoneField" class="form-control" th:value="${user.phone}" th:field="*{phone}" readonly>
+                </div>
+                <button type="button" class="btn btn-info" id="editButton">Edit</button>
+                <button type="submit" class="btn btn-success d-none" id="saveButton">Save</button>
+                <button type="button" class="btn btn-secondary d-none" id="cancelButton">Cancel</button>
+            </form>
+        </div>
+
+        <!-- Address Section -->
+        <div class="col-md-6">
+            <h4>Your Addresses</h4>
+            <div class="mb-3">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAddressModal">Add Address</button>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>House Name</th>
+                            <th>Street</th>
+                            <th>City</th>
+                            <th>State</th>
+                            <th>Country</th>
+                            <th>Zip Code</th>
+                            <th>Action</th>
+
+                        </tr>
+                        </thead>
+                        <tbody th:if="${addresses.size()>0}">
+                        <tr th:each="address : ${addresses}">
+                            <td th:text="${address.housename}"></td>
+                            <td th:text="${address.street}"></td>
+                            <td th:text="${address.city}"></td>
+                            <td th:text="${address.state}"></td>
+                            <td th:text="${address.country}"></td>
+                            <td th:text="${address.zipcode}"></td>
+                            <td><a th:href="@{/address/edit/{id}(id=${address.id})}" class="btn btn-sm btn-info"><i class="fa fa-edit"></i></a>
+                                <form th:action="@{/address/delete/{id}(id=${address.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this address?');">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Add Address -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/address/add}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="housename" class="form-label">House Name</label>
+                        <input type="text" id="housename" name="housename" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="street" class="form-label">Street</label>
+                        <input type="text" id="street" name="street" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" id="city" name="city" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" id="state" name="state" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="country" class="form-label">Country</label>
+                        <input type="text" id="country" name="country" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="zipcode" class="form-label">Zip Code</label>
+                        <input type="text" id="zipcode" name="zipcode" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Add Address</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Footer -->
+<footer class="mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <h5>About Us</h5>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Customer Service</h5>
+                <ul>
+                    <li><a href="#">Return Policy</a></li>
+                    <li><a href="#">About Shipping</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Contact Us</h5>
+                <ul>
+                    <li>Ernakulam, Kottayam</li>
+                    <li>+91 9876543210</li>
+                    <li>homely@example.com</li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Get In Touch</h5>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editButton = document.getElementById("editButton");
+        const saveButton = document.getElementById("saveButton");
+        const cancelButton = document.getElementById("cancelButton");
+
+        const formFields = [
+            document.getElementById("nameField"),
+            document.getElementById("usernameField"),
+            document.getElementById("emailField"),
+            document.getElementById("phoneField")
+        ];
+
+        // Enable editing
+        editButton.addEventListener("click", function () {
+            formFields.forEach(field => field.removeAttribute("readonly"));
+            editButton.classList.add("d-none");
+            saveButton.classList.remove("d-none");
+            cancelButton.classList.remove("d-none");
+        });
+
+        // Save changes (form submission can go here)
+        saveButton.addEventListener("click", function () {
+            formFields.forEach(field => field.setAttribute("readonly", true));
+            editButton.classList.remove("d-none");
+            saveButton.classList.add("d-none");
+            cancelButton.classList.add("d-none");
+        });
+
+        // Cancel editing
+        cancelButton.addEventListener("click", function () {
+            formFields.forEach(field => field.setAttribute("readonly", true));
+            editButton.classList.remove("d-none");
+            saveButton.classList.add("d-none");
+            cancelButton.classList.add("d-none");
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <title>Document</title>
+
+    <style>
+
+        canvas {
+            border: 1px solid black;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Edit Product</h1>
+    <form th:action="@{/admin/editProduct}" th:object="${product}" method="post" enctype="multipart/form-data">
+        <div class="modal-header">
+            <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+            <div class="row">
+                <div class="col-md-7">
+                    <input type="hidden" name="id" th:value="${product.id}">
+
+                    <div class="mb-3">
+                        <label for="editProductname" class="form-label">Product Name</label>
+                        <input type="text" name="name" th:value="${product.name}" id="editProductname" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sku" class="form-label">SKU</label>
+                        <input type="text" name="sku" th:value="${product.sku}" id="sku" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <input type="text" name="description" th:value="${product.description}" id="description" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <input type="hidden" name="categoryId" th:value="${product.category.id}">
+
+                        <select name="category.id" id="category" class="form-control">
+                            <!-- Placeholder option -->
+                            <option value="" disabled selected>-- Select Category --</option>
+                            <option th:each="category : ${categories}"
+                                    th:value="${category.id}"
+                                    th:selected="${product.category != null and category.id == product.category.id}"
+                                    th:text="${category.categoryname}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Base Price</label>
+                        <input type="text" name="price" th:value="${product.price}" id="price" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="discount" class="form-label">Base Discount Price</label>
+                        <input type="text" name="discountprice" th:value="${product.discountprice}" id="discount" class="form-control" required>
+                    </div>
+                    <div id="quantityContainer">
+                        <div class="mb-3" th:each="quantity, stat : ${product.quantities}">
+                            <input type="hidden" th:name="'quantities[' + ${stat.index} + '].id'" th:value="${quantity.id}" />
+                            <label>Quantity:</label>
+                            <input type="text" th:name="'quantities[' + ${stat.index} + '].quantity'" th:value="${quantity.quantity}" class="form-control" required>
+                            <label>Price:</label>
+                            <input type="text" th:name="'quantities[' + ${stat.index} + '].price'" th:value="${quantity.price}" class="form-control" required>
+                            <label>Stock:</label>
+                            <input type="text" th:name="'quantities[' + ${stat.index} + '].stock'" th:value="${quantity.stock}" class="form-control" required>
+                             </div>
+                    </div>
+                   <!--
+                    <button type="button" class="btn btn-primary btn-sm" onclick="addNewQuantity()">Add New Quantity</button>
+                    <div id="newQuantities"></div>
+                    -->
+
+                    <div class="col-md-6 mb-3">
+                        <label for="file1">Upload Image</label>
+                        <input type="file" id="file1" name="file1" class="form-control" accept="image/*">
+                    </div>
+
+                    <!-- Image Preview After Cropping -->
+                    <div class="col-md-6 mb-3">
+                        <label>Image Preview</label>
+                        <img id="croppedPreview1" src="" class="img-thumbnail" style="display:none; max-width: 200px;">
+                    </div>
+
+                </div>
+                <div class="col-md-5">
+                    <div class="mb-3">
+                        <label class="form-label">Edit Images</label>
+                        <div th:each="image: ${product.images}" class="row mt-3">
+                            <div>
+                                <img height="200px" width="200px"
+                                     th:if="${product.images != null and product.images.size() > 0}"
+                                     th:src="${image}" alt="product-image">
+                                <img height="200px" width="200px"
+                                     th:if="${product.images == null or product.images.size() == 0}"
+                                     th:src="@{/images/imageplaceholder.png}" alt="image-placeholder">
+                            </div>
+                            <div>
+                                <input type="checkbox" name="imagesToDelete" th:value="${image}"> Delete this image
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Save Changes</button>
+            <a type="button" href="/admin/products" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- Cropper Modal -->
+<div class="modal fade" id="cropperModal1" tabindex="-1" role="dialog" aria-labelledby="cropperModalLabel1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropperModalLabel1">Crop Image</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="image1" src="" alt="Image 1">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="cropImage1">Crop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+    function addNewQuantity() {
+    const newQuantityDiv = document.createElement('div');
+    newQuantityDiv.innerHTML = `
+        <label>Quantity:</label>
+        <input type="text" name="quantities[${document.querySelectorAll('#newQuantities .quantity-row').length}].quantity" class="form-control" required>
+        <label>Price:</label>
+        <input type="text" name="quantities[${document.querySelectorAll('#newQuantities .quantity-row').length}].price" class="form-control" required>
+        <label>Stock:</label>
+        <input type="text" name="quantities[${document.querySelectorAll('#newQuantities .quantity-row').length}].stock" class="form-control" required>
+    `;
+    newQuantityDiv.classList.add('quantity-row');
+    document.getElementById('newQuantities').appendChild(newQuantityDiv);
+}
+
+
+
+
+    // Initialize Cropper.js
+    let cropper1;
+
+    function initializeCropper(imageId) {
+        return new Cropper(document.getElementById(imageId), {
+            aspectRatio: 1,  // Optional: make it square
+            viewMode: 1, // Ensure the image fits within the container
+            scalable: true,
+            zoomable: true
+        });
+    }
+
+    document.getElementById('file1').addEventListener('change', function (event) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var imageElement = document.getElementById('image1');
+            imageElement.src = e.target.result;
+            $('#cropperModal1').modal('show');
+            if (cropper1) cropper1.destroy();  // Destroy any previous instance
+            cropper1 = initializeCropper('image1');
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    });
+
+    document.getElementById('cropImage1').addEventListener('click', function () {
+   const croppedCanvas = cropper1.getCroppedCanvas();
+   croppedCanvas.toBlob(function (blob) {
+       const file = new File([blob], 'cropped_image1.jpg', { type: 'image/jpeg' });
+       const dataTransfer = new DataTransfer();
+       dataTransfer.items.add(file);
+       document.getElementById('file1').files = dataTransfer.files; // Set the cropped image in the file input
+
+         // **Set the cropped image as preview**
+            const croppedImageURL = URL.createObjectURL(blob); // Create a preview URL
+            const previewElement = document.getElementById('croppedPreview1'); // Get preview image element
+            previewElement.src = croppedImageURL; // Set preview source
+            previewElement.style.display = "block"; // Ensure it's visible
+   });
+
+   $('#cropperModal1').modal('hide'); // Close the modal after cropping
+});
+
+</script>
+</body>
+</html>

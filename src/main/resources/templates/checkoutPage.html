@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homely - Organic Products</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <style>
+        .navbar {
+            padding: 15px 0;
+            background: white;
+        }
+
+        .brand-logo {
+            height: 40px;
+        }
+
+        footer {
+            background: #2E8B57;
+            color: white;
+            padding: 40px 0 20px;
+        }
+
+        footer h5 {
+            margin-bottom: 20px;
+        }
+
+        footer ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        footer ul li {
+            margin-bottom: 10px;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+
+        .address-card {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .selected-address {
+            border: 2px solid #007bff; /* Blue border for highlight */
+            background-color: #e9f7fe; /* Light blue background */
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5); /* Subtle glow effect */
+}
+
+         .deliver-btn {
+            background-color: #2E8B57;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+        }
+        .add-address-btn {
+            background-color: #B8860B;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+        }
+        .proceed-btn {
+            background-color: #2E8B57;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 5px;
+        }
+        .payment-option {
+            margin: 10px 0;
+        }
+
+
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <div class="d-flex">
+            <a class="navbar-brand" href="/">
+                <img src="/images/logo.png" alt="Homely" class="brand-logo">
+            </a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ml-5">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/products">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/wallet">Wallet</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex align-items-center">
+            <form class="d-flex me-3">
+                <input class="form-control" type="search" placeholder="Search">
+            </form>
+            <a href="/wishlist" class="me-3"><i class="far fa-heart"></i></a>
+            <a href="/cart/view-cart" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle fa-lg"></i> <!-- Profile Icon -->
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" th:href="@{/view-profile}">View Profile</a></li>
+                    <li><a class="dropdown-item" th:href="@{/view-orders}">View Orders</a></li>
+                    <li><a class="dropdown-item" th:href="@{/update-password}">Update Password</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</nav>
+<!-- Main Content -->
+<div class="container my-5">
+    <div class="row">
+        <!-- Shipping Address Section -->
+        <div class="col-md-6">
+            <div class="card bg-light">
+                <div class="card-body shadow">
+                    <h5 class="card-title">Shipping Address</h5>
+                    <div th:if="${#lists.size(addresses) ==0}">
+                        <p>No addresses found. Please <a th:href="@{/address/add}">add a new address</a>.</p>
+                    </div>
+                    <div th:if="${#lists.size(addresses) > 0}" th:each="address: ${addresses}">
+                        <div class="address-card cursor-pointer">
+                            <input type="hidden" id="selectedAddressId" name="selectedAddressId">
+                            <p class="mb-1"><strong th:text="${address.housename}">Athila Rahim</strong></p>
+                            <p class="mb-1" th:text="${address.street} + ', ' + ${address.city}">B2-405, Abcd Building, Near Xyz Hospital,</p>
+                            <p class="mb-2" th:text="${address.state} + ', ' + ${address.country} + ', ' + ${address.zipcode}">Kochi, Kerala, 686280</p>
+                            <a type="button" class="btn btn-success" th:attr="onclick='selectAddress(this,'+${address.id}+')'">Select Address</a>
+                            <a type="button" class="btn btn-warning" th:href="@{/checkout/address/edit/{id}(id=${address.id})}">Edit Address</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAddressModal">Add a New Address</button>
+            </div>
+        </div>
+
+        <!-- Purchase Details Section -->
+        <div class="col-md-6">
+            <!-- Coupon Code Section -->
+            <div class="card bg-light mb-4 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Coupon Code</h5>
+                    <p class="small text-muted">Enter your coupon code and purchase on a reduced rate. Please enter only one coupon code and hit the apply button or find your coupon if available</p>
+
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="couponCode" placeholder="Coupon code">
+                        <button class="btn btn-success" id="applyCouponBtn" type="button" onclick="applyCoupon()">Apply</button>
+                    </div>
+                    <p id="couponMessage" class="text-danger"></p>
+                    <div class="text-center">
+                        <span class="text-muted">OR</span>
+                        <br>
+                        <a class="btn btn-success mt-2" href="/checkout/coupons">Find my coupon</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Purchase Details Section -->
+            <div class="card bg-light shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Purchase Details</h5>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total</span>
+                        <span id="subtotal" th:text="${cartSubtotal}"></span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping and Handling</span>
+                        <span id="deliveryFee" th:text="${deliveryFee}">₹0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Coupon Discount</span>
+                        <span id="couponDiscount">0.0</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total items</span>
+                        <span id="productCount" th:text="${cartItems.size()}">1</span>
+
+                    </div>
+                    <div class="d-flex justify-content-between mb-4">
+                        <strong>Amount to Pay</strong>
+                        <strong id="totalFee" th:text="${cartSubtotal+deliveryFee}">₹191.00</strong>
+                    </div>
+
+                    <h6>Choose your payment method</h6>
+                    <div class="payment-option">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="payment" id="wallet">
+                            <label class="form-check-label" for="wallet">Wallet</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="payment" id="cod">
+                            <label class="form-check-label" for="cod">Cash On Delivery</label>
+                        </div>
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="radio" name="payment" id="razorpay">
+                            <label class="form-check-label" for="razorpay">RazorPay</label>
+                        </div>
+                    </div>
+                    <form>
+                        <!-- Add this inside the form on the checkout page -->
+                        <input type="hidden" id="selectedItemIds" name="selectedItemIds" th:value="${#strings.listJoin(cartItems.![id], ',')}">
+                        <button class="proceed-btn w-100">Proceed to payment</button>
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Add Address -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/checkout/address/add}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="housename" class="form-label">House Name</label>
+                        <input type="text" id="housename" name="housename" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="street" class="form-label">Street</label>
+                        <input type="text" id="street" name="street" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" id="city" name="city" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" id="state" name="state" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="country" class="form-label">Country</label>
+                        <input type="text" id="country" name="country" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="zipcode" class="form-label">Zip Code</label>
+                        <input type="text" id="zipcode" name="zipcode" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Add Address</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <h5>About Us</h5>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Customer Service</h5>
+                <ul>
+                    <li><a href="#">Return Policy</a></li>
+                    <li><a href="#">About Shipping</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Contact Us</h5>
+                <ul>
+                    <li>Ernakulam, Kottayam</li>
+                    <li>+91 9876543210</li>
+                    <li>homely@example.com</li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Get In Touch</h5>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+
+    function applyCoupon() {
+    let couponCode = document.getElementById("couponCode").value;
+    let cartTotal = parseFloat(document.getElementById("subtotal").innerText.replace("₹", ""));
+    let couponMessage = document.getElementById("couponMessage");
+    let couponDiscountElement = document.getElementById("couponDiscount");
+    let applyButton = document.getElementById("applyCouponBtn");
+    const deliveryFeeElement = document.getElementById("deliveryFee");
+    const totalFeeElement = document.getElementById("totalFee");
+
+    const deliveryFee = deliveryFeeElement ? parseFloat(deliveryFeeElement.textContent.trim().replace(/[^\d.-]/g, "")) || 0 : 0;
+
+    if (!couponCode) {
+        couponMessage.innerText = "Please enter a coupon code!";
+        couponMessage.classList.add("text-danger");
+        return;
+    }
+
+    fetch(`/coupons/validate?code=${couponCode}&cartTotal=${cartTotal}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === "Coupon applied successfully!") {
+                couponMessage.classList.remove("text-danger");
+                couponMessage.classList.add("text-success");
+
+                let updatedCartTotal = data.updatedCartTotal;
+                totalFeeElement.innerText = `₹${updatedCartTotal.toFixed(1)}`;
+                couponDiscountElement.innerText = `${data.couponDiscount.toFixed(1)}`;
+
+                // Toggle button text to "Remove"
+                applyButton.innerText = "Remove";
+                applyButton.classList.remove("btn-success");
+                applyButton.classList.add("btn-danger");
+                applyButton.setAttribute("onclick", "removeCoupon()");
+            } else {
+                couponMessage.classList.remove("text-success");
+                couponMessage.classList.add("text-danger");
+                totalFeeElement.innerText = `₹${(cartTotal + deliveryFee).toFixed(1)}`;
+                couponDiscountElement.innerText = "0.0";
+            }
+            couponMessage.innerText = data.message;
+        })
+        .catch(error => console.error("Error validating coupon:", error));
+}
+
+function removeCoupon() {
+    let cartTotal = parseFloat(document.getElementById("subtotal").innerText.replace("₹", ""));
+    let couponMessage = document.getElementById("couponMessage");
+    let couponDiscountElement = document.getElementById("couponDiscount");
+    let applyButton = document.getElementById("applyCouponBtn");
+    const deliveryFeeElement = document.getElementById("deliveryFee");
+    const totalFeeElement = document.getElementById("totalFee");
+
+    const deliveryFee = deliveryFeeElement ? parseFloat(deliveryFeeElement.textContent.trim().replace(/[^\d.-]/g, "")) || 0 : 0;
+
+    // Reset values
+    couponMessage.innerText = "Coupon removed.";
+    couponMessage.classList.remove("text-success");
+    couponMessage.classList.add("text-danger");
+    totalFeeElement.innerText = `₹${(cartTotal + deliveryFee).toFixed(1)}`;
+    couponDiscountElement.innerText = "0.0";
+    document.getElementById("couponCode").value = ""; // Clear input field
+
+    // Toggle button back to "Apply"
+    applyButton.innerText = "Apply";
+    applyButton.classList.remove("btn-danger");
+    applyButton.classList.add("btn-success");
+    applyButton.setAttribute("onclick", "applyCoupon()");
+}
+
+
+
+
+    let selectedAddressId = null;
+
+        function selectAddress(element, addressId) {
+        console.log("Address ID:", addressId);
+
+        document.querySelectorAll('.address-card').forEach(card => {
+        card.classList.remove('selected-address');
+    });
+
+    // Highlight the selected address card
+    const card = element.closest('.address-card');
+    card.classList.add('selected-address');
+
+
+            // Set the selected address ID
+            selectedAddressId = addressId;
+            document.getElementById('selectedAddressId').value = selectedAddressId;
+}
+
+    document.querySelector('.proceed-btn').addEventListener('click', function(event) {
+    event.preventDefault();
+
+    const deliveryFeeElement = document.getElementById('deliveryFee');
+    const totalAmountElement = document.getElementById('totalFee');
+    const productCountElement = document.getElementById('productCount');
+
+    const deliveryFee = deliveryFeeElement ? parseFloat(deliveryFeeElement.textContent.trim().replace(/[^\d.-]/g, "")) || 0 : 0;
+    const totalAmount = totalAmountElement ? parseFloat(totalAmountElement.textContent.trim().replace(/[^\d.-]/g, "")) || 0 : 0;
+    const productCount = productCountElement ? parseFloat(productCountElement.textContent.trim().replace(/[^\d.-]/g, "")) || 0 : 0;
+    const couponDiscount = document.getElementById("couponDiscount").textContent;
+
+    let cartTotal = parseFloat(document.getElementById("subtotal").innerText.replace("₹", ""));
+    const paymentMethod = document.querySelector('input[name="payment"]:checked');
+    const selectedItemIds = document.getElementById("selectedItemIds").value;
+
+    let finalAmount = cartTotal + deliveryFee - couponDiscount;
+
+    if (!paymentMethod) {
+         Swal.fire({
+                icon: "error",
+                text: "Please select a payment method.",
+                });
+
+        return;
+    }
+
+    const paymentId = paymentMethod.id === "cod" ? 1 : (paymentMethod.id === "razorpay" ? 2 : 3);
+
+    if (!selectedAddressId) {
+        Swal.fire({
+                icon: "error",
+                text: "Please select an address before placing the order.",
+                });
+        return;
+    }
+
+    if(paymentId==1 && finalAmount>1000){
+    Swal.fire({
+                icon: "error",
+                text: "COD is not allowed for orders above 1000Rs",
+                });
+        return;
+    }
+
+    console.log("Delivery Fee:", deliveryFee);
+    console.log("Total Amount:", totalAmount);
+    console.log("Product Count:", productCount);
+    console.log("Payment ID:", paymentId);
+
+
+    if(paymentId==3){
+
+       let walletBalance = [[${walletBalance}]];
+       if (walletBalance >= finalAmount) {
+
+       fetch('/checkout/placeOrder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                deliveryFee,
+                cartTotal,
+                productCount,
+                addressId: selectedAddressId,
+                paymentId,
+                selectedItemIds,
+                couponDiscount
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                icon: "success",
+                title: "Order placed successfully!",
+                showConfirmButton: false,
+                timer: 1500
+               }).then(() => {
+                        window.location.href = `/order-summary/${data.orderId}`;
+                    });
+
+            } else {
+                alert('Failed to place order: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error placing order:', error);
+            alert('An error occurred. Please try again.');
+        });
+
+       } else {
+            Swal.fire({
+                icon: "error",
+                text: "Insufficient balance in wallet. Please select another payment method.",
+                });
+       }
+    }
+
+    else if (paymentMethod.id === "razorpay") {
+        fetch(`/razorpay/order?amount=${totalAmount}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let order = JSON.parse(data.order);
+                    localStorage.setItem("razorpay_order_id", order.id); //store the orderId in localStorage
+                    let options = {
+    "key": "rzp_test_QiaerKKzJd5d6u",
+    "amount": order.amount,
+    "currency": "INR",
+    "name": "Test Store",
+    "description": "Purchase",
+    "order_id": order.id,
+    "handler": function (response) {
+        console.log("Payment Successful:", response);
+        localStorage.removeItem("razorpay_order_id"); // Clear on success
+
+        fetch('/checkout/placeOrder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                deliveryFee,
+                cartTotal,
+                productCount,
+                addressId: selectedAddressId,
+                paymentId,
+                selectedItemIds,
+                couponDiscount,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpaySignature: response.razorpay_signature
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Order placed successfully!",
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = `/order-summary/${data.orderId}`;
+                });
+            } else {
+                alert('Failed to place order: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error placing order:', error);
+            alert('An error occurred. Please try again.');
+        });
+    },
+    "prefill": {
+        "name": "Test User",
+        "email": "test@example.com",
+        "contact": "9999999999"
+    },
+    "theme": {
+        "color": "#3399cc"
+    },
+    "modal": {
+        "ondismiss": function () {
+            console.log("Payment modal closed!");
+            let databaseOrderId = localStorage.getItem("razorpay_order_id");
+            if (databaseOrderId) {
+                fetch(`/checkout/markPaymentPending`,{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                deliveryFee,
+                cartTotal,
+                productCount,
+                addressId: selectedAddressId,
+                paymentId,
+                selectedItemIds,
+                couponDiscount
+            }),
+        })
+           .then(response => response.json())
+           .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: "error",
+                    text: "Your order has been moved to payment pending!",
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = `/order-summary/${data.orderId}`;
+                });
+            } else {
+                alert('Failed to place order: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error placing order:', error);
+            alert('An error occurred. Please try again.');
+        });
+            }
+        }
+    }
+};
+
+let rzp = new Razorpay(options);
+rzp.open();
+
+                } else {
+                    alert("Error creating payment order: " + data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    } else {
+        // **For COD or other payments, send the order directly**
+        fetch('/checkout/placeOrder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                deliveryFee,
+                cartTotal,
+                productCount,
+                addressId: selectedAddressId,
+                paymentId,
+                selectedItemIds,
+                couponDiscount
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                icon: "success",
+                title: "Order placed successfully!",
+                showConfirmButton: false,
+                timer: 1500
+               }).then(() => {
+                        window.location.href = `/order-summary/${data.orderId}`;
+                    });
+            } else {
+                alert('Failed to place order: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error placing order:', error);
+            alert('An error occurred. Please try again.');
+        });
+    }
+});
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>

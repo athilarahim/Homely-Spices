@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homely - Organic Products</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+
+        .navbar {
+            padding: 15px 0;
+            background: white;
+        }
+
+        .brand-logo {
+            height: 40px;
+        }
+
+        footer {
+            background: #2E8B57;
+            color: white;
+            padding: 40px 0 20px;
+        }
+
+        footer h5 {
+            margin-bottom: 20px;
+        }
+
+        footer ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        footer ul li {
+            margin-bottom: 10px;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+         .status-badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .status-in-transit {
+            background-color: #ffd700;
+        }
+
+        .status-delivered {
+            background-color: #28a745;
+        }
+
+        .status-cancelled {
+            background-color: #dc3545;
+        }
+
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <div class="d-flex">
+            <a class="navbar-brand" href="/">
+                <img src="/images/logo.png" alt="Homely" class="brand-logo">
+            </a>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ml-5">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/products">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/wallet">Wallet</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex align-items-center">
+            <form class="d-flex me-3">
+                <input class="form-control" type="search" placeholder="Search">
+            </form>
+            <a href="/wishlist" class="me-3"><i class="far fa-heart"></i></a>
+            <a href="/cart/view-cart" class="me-3"><i class="fas fa-shopping-cart"></i></a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle fa-lg"></i> <!-- Profile Icon -->
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" th:href="@{/view-profile}">View Profile</a></li>
+                    <li><a class="dropdown-item" th:href="@{/view-orders}">View Orders</a></li>
+                    <li><a class="dropdown-item" th:href="@{/update-password}">Update Password</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <h2>My Orders</h2>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Product</th>
+            <th>Details</th>
+            <th>Track Order</th>
+            <th>Status</th>
+            <th>Action</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order : ${orders}">
+            <td th:text="'#' + ${order.id}">#11203</td>
+            <td>
+                <ul>
+                    <li style="list-style-type: none" th:each="item : ${order.orderItems}">
+                        <img th:if="${item.product.images != null and item.product.images.size() > 0}"
+                             th:src="${item.product.images[0]}" alt="Product" width="50">
+                        <img th:if="${item.product.images == null or item.product.images.size() == 0}"
+                             th:src="@{/images/imageplaceholder.jpg}" alt="Product" width="50">
+                        <span th:text="${item.product.name} +'('+ ${item.quantity} +')'">Chilli powder</span>
+                    </li>
+                </ul>
+            </td>
+            <td>
+                <a class="btn btn-sm btn-outline-primary" th:href="@{/order-summary/{id}(id=${order.id})}">View Summary</a>
+
+            </td>
+            <td>
+                <a class="btn btn-sm btn-outline-info" th:href="@{/orders/{orderId}(orderId=${order.id})}">Track Order</a>
+            </td>
+            <td>
+                <span th:if="${order.orderStatuses != null and !#lists.isEmpty(order.orderStatuses) and
+            order.latestStatus.status == 'Cancelled'}"
+                      class="text-danger">Cancelled</span>
+                <span th:if="${order.orderStatuses != null and !#lists.isEmpty(order.orderStatuses) and
+            order.latestStatus.status == 'Delivered'}"
+                      class="text-success">Delivered</span>
+                <span th:if="${order.orderStatuses != null and !#lists.isEmpty(order.orderStatuses) and
+            order.latestStatus.status == 'Return Pending'}"
+                      class="text-warning">Return Pending</span>
+                <span th:if="${order.orderStatuses != null and !#lists.isEmpty(order.orderStatuses) and
+            order.latestStatus.status == 'Return Received'}"
+                      class="text-success">Return Received</span>
+                <span th:if="${order.orderStatuses != null and !#lists.isEmpty(order.orderStatuses) and
+            order.latestStatus.status == 'Return Rejected'}"
+                      class="text-danger">Return Rejected</span>
+                <span th:if="${order.orderStatuses != null and !#lists.isEmpty(order.orderStatuses) and
+            (order.latestStatus.status == 'Order placed' or
+             order.latestStatus.status == 'Confirmed' or
+             order.latestStatus.status == 'In Transit' or
+             order.latestStatus.status == 'Payment Pending')}"
+                      class="text-primary" th:text="${order.latestStatus.status}"></span>
+
+            </td>
+            <td>
+                <button class="btn btn-outline-danger btn-sm"
+                        th:if="${order.orderStatuses != null and !#lists.isEmpty(order.orderStatuses) and
+            order.latestStatus.status != 'Cancelled' and
+            order.latestStatus.status != 'Delivered' and
+            order.latestStatus.status != 'Return Pending' and
+            order.latestStatus.status != 'Return Received' and
+            order.latestStatus.status != 'Return Rejected'}"
+                        th:attr="onclick='cancelOrder(' + ${order.id} + ')'"
+                        type="button">
+                    Cancel Order
+                </button>
+
+                <button class="btn btn-danger btn-sm"
+                        th:if="${order.orderStatuses != null and !#lists.isEmpty(order.orderStatuses) and
+            order.latestStatus.status == 'Cancelled'}"
+                        type="button">
+                    Cancelled
+                </button>
+
+                <button class="btn btn-outline-dark btn-sm"
+                        th:if="${order.orderStatuses != null and !#lists.isEmpty(order.orderStatuses) and
+            order.latestStatus.status == 'Delivered'}"
+                        th:attr="onclick='returnOrder(' + ${order.id} + ', \'' + ${order.latestStatus.statusChangeDate} + '\')'"
+                        type="button">
+                    Return Order
+                </button>
+                <button class="btn btn-dark btn-sm"
+                        th:if="${order.orderStatuses != null and !#lists.isEmpty(order.orderStatuses) and
+            order.latestStatus.status == 'Return Pending' or
+            order.latestStatus.status == 'Return Received' or
+            order.latestStatus.status == 'Return Rejected'}"
+                        type="button" th:text="${order.latestStatus.status}">
+                    Return text
+                </button>
+
+                <button class="btn btn-primary btn-sm"
+                        th:if="${order.orderStatuses != null and !#lists.isEmpty(order.orderStatuses) and
+            order.latestStatus.status == 'Payment Pending'}"
+                        th:attr="onclick='proceedPayment(' + ${order.id} + ')'"
+                        type="button">
+                    Pay Now
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<!-- Footer -->
+<footer class="mt-5 mt-auto">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <h5>About Us</h5>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Customer Service</h5>
+                <ul>
+                    <li><a href="#">Return Policy</a></li>
+                    <li><a href="#">About Shipping</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Contact Us</h5>
+                <ul>
+                    <li>Ernakulam, Kottayam</li>
+                    <li>+91 9876543210</li>
+                    <li>homely@example.com</li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Get In Touch</h5>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script>
+    function cancelOrder(orderId) {
+        if (confirm("Are you sure you want to cancel this order?")) {
+            fetch(`/orders/cancel/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    Swal.fire({
+                icon: "success",
+                title: "Order cancelled successfully!",
+                showConfirmButton: false,
+                timer: 1500
+           });
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    alert("Failed to cancel the order. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error cancelling order:", error);
+                alert("An error occurred. Please try again.");
+            });
+        }
+    }
+
+    function returnOrder(orderId, deliveredDate) {
+    if (!deliveredDate) {
+        alert("Delivered date is missing.");
+        return false;
+    }
+
+    // Convert deliveredDate (YYYY-MM-DD) to a JavaScript Date object
+    let delivered = new Date(deliveredDate);
+    let today = new Date();
+
+
+    // Calculate the difference in days
+    let diffInTime = today - delivered;
+    let diffInDays = diffInTime / (1000 * 60 * 60 * 24);
+
+    if (diffInDays <= 2) {
+        // Redirect to return order page
+        window.location.href = "/return-order/" + orderId;
+    } else {
+        Swal.fire({
+                icon: "error",
+                text: "You can only return within 2 days of delivery!",
+           });
+    }
+    return false;
+}
+
+
+    function proceedPayment(orderId) {
+    let savedOrderId = localStorage.getItem("razorpay_order_id");
+
+    if (!savedOrderId) {
+        alert("No pending payment found!");
+        return;
+    }
+
+    let options = {
+        "key": "rzp_test_QiaerKKzJd5d6u",
+        "order_id": savedOrderId,
+        "name": "Test Store",
+        "description": "Resume Payment",
+        "handler": function (response) {
+            console.log("Payment Successful:", response);
+
+            // Call backend to update order status
+            fetch(`/update-order-status/${orderId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    paymentId: response.razorpay_payment_id,
+                    status: "Order placed"
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Clear local storage and redirect
+                    localStorage.removeItem("razorpay_order_id");
+
+                    Swal.fire({
+                    icon: "success",
+                    text: "Payment has been completed!",
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = "/view-orders";
+                });
+
+                } else {
+                    alert("Failed to update order status. Please contact support.");
+                }
+            })
+            .catch(error => {
+                console.error("Error updating order status:", error);
+                alert("Something went wrong. Please try again.");
+            });
+        },
+        "theme": { "color": "#3399cc" }
+    };
+
+    let rzp = new Razorpay(options);
+    rzp.open();
+}
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>
