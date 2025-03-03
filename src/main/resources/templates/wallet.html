@@ -137,7 +137,10 @@
         <div class="col-md-4">
             <div class="wallet-balance-card text-center shadow">
                 <h4 class="mb-4">Wallet Balance</h4>
-                <p class="balance-amount mb-4">₹<span th:if="${walletBalance!=null}" th:text="${transactions[0].walletBalance}">3500.00</span></p>
+                <p class="balance-amount mb-4" th:if="${transactions != null and not #lists.isEmpty(transactions)}">₹<span th:text="${transactions[0].walletBalance}">3500.00</span></p>
+                <p th:if="${#lists.isEmpty(transactions)}">
+                    0.0
+                </p>
             </div>
         </div>
 
