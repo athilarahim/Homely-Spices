@@ -15,12 +15,12 @@ public interface WalletRepo extends JpaRepository<Wallet, Integer> {
     @Query("SELECT w FROM Wallet w WHERE w.user.id = :userId ORDER BY w.transactionDate DESC")
     List<Wallet> findWalletTransactionsByUserId(@Param("userId") int userId);
 
-    @Query(value = "SELECT COALESCE(wallet_balance, 0.0) FROM wallet " +
+    @Query(value = "SELECT COALESCE((SELECT wallet_balance FROM wallet " +
             "WHERE user_id = :userId " +
             "ORDER BY transaction_date DESC, id DESC " +
-            "LIMIT 1",
-            nativeQuery = true)
+            "LIMIT 1), 0.0)", nativeQuery = true)
     Double findLatestWalletBalanceByUserId(@Param("userId") int userId);
+
 
 
     @Query("SELECT COALESCE(SUM(w.transactionAmount), 0) FROM Wallet w WHERE w.transactionType = 'CREDIT'")
