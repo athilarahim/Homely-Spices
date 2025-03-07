@@ -173,6 +173,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>homely-app</finalName>
 	</build>
 
 </project>
