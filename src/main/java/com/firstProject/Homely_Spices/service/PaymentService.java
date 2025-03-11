@@ -20,7 +20,7 @@ public class PaymentService {
         RazorpayClient client = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
 
         JSONObject options = new JSONObject();
-        options.put("amount", (int) (amount * 100)); // Convert amount to paisa
+        options.put("amount", (int) (amount * 100)); // Convert amount to Rs
         options.put("currency", "INR");
         options.put("receipt", "txn_123456");
 

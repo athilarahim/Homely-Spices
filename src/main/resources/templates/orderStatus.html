@@ -7,24 +7,176 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #2E8B57;
+            --primary-light: #8FBC8F;
+            --primary-dark: #1e6e43;
+            --secondary-color: #F5F5F5;
+            --accent-color: #FF8C00;
+        }
+
 
         .navbar {
             padding: 15px 0;
             background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .brand-logo {
             height: 40px;
         }
 
+
+
+        .order-tracking-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .order-id {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .order-date {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .tracking-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .tracking-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 25%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #E0E0E0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .step-icon.active {
+            background-color: var(--primary-color);
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+            color: #777;
+        }
+
+        .step-label.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tracking-line {
+            top: 30px;
+            left: 50px;
+            right: 50px;
+            height: 4px;
+            background-color: #E0E0E0;
+            z-index: 1;
+        }
+
+        .tracking-line-progress {
+            height: 100%;
+            background-color: var(--primary-color);
+        }
+
+        .status-history {
+            margin-top: 40px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-icon {
+            color: var(--primary-color);
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .status-content {
+            flex-grow: 1;
+        }
+
+        .status-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .status-date {
+            color: #777;
+            font-size: 0.85rem;
+        }
+
+        .cancelled-order {
+            background-color: #FFF1F0;
+            color: #D9534F;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .cancelled-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
         footer {
-            background: #2E8B57;
+            background: var(--primary-color);
             color: white;
             padding: 40px 0 20px;
         }
 
         footer h5 {
             margin-bottom: 20px;
+            font-weight: 600;
         }
 
         footer ul {
@@ -39,6 +191,12 @@
         footer a {
             color: white;
             text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        footer a:hover {
+            color: #f0f0f0;
+            text-decoration: underline;
         }
 
         .social-icons {
@@ -47,7 +205,49 @@
             margin-top: 20px;
         }
 
+        .social-icons a {
+            background-color: rgba(255,255,255,0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
 
+        .social-icons a:hover {
+            background-color: rgba(255,255,255,0.4);
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .tracking-steps {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .tracking-step {
+                width: 100%;
+                flex-direction: row;
+                margin-bottom: 15px;
+            }
+
+            .step-icon {
+                margin-bottom: 0;
+                margin-right: 15px;
+                width: 50px;
+                height: 50px;
+            }
+
+            .tracking-line {
+                display: none;
+            }
+
+            .step-label {
+                text-align: left;
+            }
+        }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -60,10 +260,10 @@
             </a>
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ml-5">
                 <li class="nav-item">
-                    <a class="nav-link active" href="/home">Home</a>
+                    <a class="nav-link" href="/home">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/products">Products</a>
+                    <a class="nav-link active" href="/products">Products</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/wallet">Wallet</a>
@@ -71,8 +271,19 @@
             </ul>
         </div>
         <div class="d-flex align-items-center">
-            <form class="d-flex me-3">
-                <input class="form-control" type="search" placeholder="Search">
+            <form class="d-flex me-3" th:action="@{/products/search}">
+                <input class="form-control" name="query" type="search" id="searchInput" placeholder="Search">
+                <!-- Preserve Selected Filters -->
+                <th:block th:each="category : ${selectedCategories}">
+                    <input type="hidden" name="categories" th:value="${category}">
+                </th:block>
+
+                <input type="hidden" name="priceRange" th:value="${selectedPriceRange}">
+
+                <th:block th:each="quantity : ${selectedQuantities}">
+                    <input type="hidden" name="quantities" th:value="${quantity}">
+                </th:block>
+                <button style="opacity:0.6; margin-left: 3px" class="btn bt-sm btn-primary" type="submit"><i class="fas fa-search"></i></button>
             </form>
             <a href="/wishlist" class="me-3"><i class="far fa-heart"></i></a>
             <a href="/cart/view-cart" class="me-3"><i class="fas fa-shopping-cart"></i></a>
@@ -88,43 +299,98 @@
                     <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
                 </ul>
             </div>
-
         </div>
     </div>
 </nav>
 
 <div class="container">
-    <div th:if="${order.latestStatus.status!='Cancelled'}">
-    <h3>Order Status - Order #<span th:text="${order.id}"></span></h3>
-    <div class="d-flex justify-content-between mb-2 mt-5">
-        <span class="badge bg-secondary text-white me-2">Order placed</span>
-        <span class="badge bg-secondary text-white me-2">Confirmed</span>
-        <span class="badge bg-secondary text-white me-2">In Transit</span>
-        <span class="badge bg-secondary text-white me-2">Delivered</span>
+    <div class="order-tracking-container">
+        <div class="order-header">
+            <div>
+                <div class="order-id">Order #<span th:text="${order.id}"></span></div>
+                <div th:if="${!order.orderStatuses.isEmpty()}" class="order-date">
+                    Placed on <span th:text="${#temporals.format(order.orderStatuses[0].statusChangeDate, 'MMMM dd, yyyy')}"></span>
+                </div>
+            </div>
+            <div th:if="${order.latestStatus.status!='Cancelled'}"
+                 class="badge bg-primary rounded-pill py-2 px-3">
+                <span th:text="${order.latestStatus.status}"></span>
+            </div>
+            <div th:if="${order.latestStatus.status=='Cancelled'}"
+                 class="badge bg-danger rounded-pill py-2 px-3">
+                Cancelled
+            </div>
+        </div>
 
-    </div>
-    <div class="progress" style="height: 30px;">
-        <div class="progress-bar bg-success"
-             role="progressbar"
-             th:style="'width: ' + ${order.orderStatuses.size() * 25} + '%'"
-             th:if="${order.orderStatuses != null and !order.orderStatuses.isEmpty()}"
-             th:text="${order.latestStatus.status}">
+        <div th:if="${order.latestStatus.status!='Cancelled'}">
+            <!-- Order tracking visualization -->
+            <div class="tracking-line mb-3">
+                <div class="tracking-line-progress"
+                     th:style="'width: ' + ${(order.orderStatuses.size() - 1) * 33.33} + '%'">
+                </div>
+            </div>
+
+            <div class="tracking-steps">
+                <!-- Order Placed Step -->
+                <div class="tracking-step">
+                    <div class="step-icon active">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="step-label active">Order Placed</div>
+                </div>
+
+                <!-- Confirmed Step -->
+                <div class="tracking-step">
+                    <div th:class="${order.orderStatuses.size() > 1 ? 'step-icon active' : 'step-icon'}">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div th:class="${order.orderStatuses.size() > 1 ? 'step-label active' : 'step-label'}">Confirmed</div>
+                </div>
+
+                <!-- In Transit Step -->
+                <div class="tracking-step">
+                    <div th:class="${order.orderStatuses.size() > 2 ? 'step-icon active' : 'step-icon'}">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div th:class="${order.orderStatuses.size() > 2 ? 'step-label active' : 'step-label'}">In Transit</div>
+                </div>
+
+                <!-- Delivered Step -->
+                <div class="tracking-step">
+                    <div th:class="${order.orderStatuses.size() > 3 ? 'step-icon active' : 'step-icon'}">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                    <div th:class="${order.orderStatuses.size() > 3 ? 'step-label active' : 'step-label'}">Delivered</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cancelled Order Message -->
+        <div th:if="${order.latestStatus.status =='Cancelled'}" class="cancelled-order">
+            <i class="fas fa-times-circle cancelled-icon"></i>
+            <h4>Your Order Has Been Cancelled</h4>
+        </div>
+
+        <!-- Status History -->
+        <div class="status-history">
+            <h5 class="mb-3">Order Status History</h5>
+            <div class="status-items">
+                <div class="status-item" th:each="status : ${order.orderStatuses}">
+                    <div class="status-icon">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="status-content">
+                        <div class="status-title" th:text="${status.status}"></div>
+                        <div class="status-date" th:if="${status.statusChangeDate != null}"
+                             th:text="${#temporals.format(status.statusChangeDate, 'EEEE, MMMM dd, yyyy - HH:mm')}">
+                        </div>
+                        <div class="status-date" th:if="${status.statusChangeDate == null}">Date not available</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    </div>
-    <div th:if="${order.latestStatus.status =='Cancelled'}" class="mt-4">
-        <p>Your Order has been cancelled!</p>
-    </div>
-    <ul class="list-group mt-3">
-        <li class="list-group-item" th:each="status : ${order.orderStatuses}">
-            <span th:text="${status.status} + ' on'"></span>
-            <span th:if="${status.statusChangeDate != null}"
-                  th:text="${#temporals.format(status.statusChangeDate, 'yyyy-MM-dd HH:mm')}"></span>
-            <span th:if="${status.statusChangeDate == null}">Date not available</span>
-        </li>
-    </ul>
 </div>
-
 
 <!-- Footer -->
 <footer class="mt-5 mt-auto">

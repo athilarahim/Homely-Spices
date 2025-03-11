@@ -1,5 +1,6 @@
 package com.firstProject.Homely_Spices.controllers;
 
+import com.firstProject.Homely_Spices.DTO.PasswordUpdateRequestDTO;
 import com.firstProject.Homely_Spices.model.Address;
 import com.firstProject.Homely_Spices.model.Orders;
 import com.firstProject.Homely_Spices.model.Product;
@@ -9,8 +10,17 @@ import com.firstProject.Homely_Spices.repo.UserRepo;
 import com.firstProject.Homely_Spices.service.OrderService;
 import com.firstProject.Homely_Spices.service.UserProfileService;
 import com.firstProject.Homely_Spices.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +44,9 @@ public class UserProfileController {
 
     @Autowired
     UserRepo userRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     @GetMapping("/view-profile")
@@ -136,6 +149,42 @@ public class UserProfileController {
 
         // Redirect back to the address list page
         return "redirect:/view-profile";
+    }
+
+    @GetMapping("/update-password")
+    public String PasswordUpdatePage(){
+        return "updatePassword";
+    }
+
+    @PutMapping("/update-password")
+    public ResponseEntity<String> updatePassword(@RequestBody PasswordUpdateRequestDTO request,
+                                                 HttpServletRequest httpRequest,
+                                                 HttpServletResponse httpResponse) {
+        // Fetch the currently authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        // Find the user and update password
+        Users user = userRepo.findByUsername(authentication.getName()).orElseThrow(()->new RuntimeException("User not found"));
+
+
+        if (user != null) {
+
+            if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password is incorrect");
+            }
+
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepo.save(user);
+
+            // Logout the user after updating the password
+            new SecurityContextLogoutHandler().logout(httpRequest, httpResponse, authentication);
+
+            return ResponseEntity.ok("Password updated successfully. Login again with your new password.");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
     }
 }
 

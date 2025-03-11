@@ -5,7 +5,9 @@ import com.firstProject.Homely_Spices.model.Users;
 import com.firstProject.Homely_Spices.repo.AddressRepo;
 import com.firstProject.Homely_Spices.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.ArrayList;
 import java.util.List;
